@@ -36,3 +36,10 @@ n1=input("Enter a number:") #input 4
 n2 = int(n1)
 print(n2+n2)
 #output will now be 8
+
+name=input('Plase enter your name: ')
+print('Hello', name)
+
+i = int(input("Enter a number"))
+
+print("I have doubled your number:",i*2)
