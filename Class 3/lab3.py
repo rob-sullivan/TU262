@@ -43,9 +43,10 @@ print("Negative. Goodbye!")
 
 # ex 8
 a = "*"
-for i in range(1,7):
-  print(a)
-  a = a + "*"
+for i in range(1,6):
+  for j in range(1, i+1):
+    print("*", end = "")
+  print()
 
 # ex 9 a
 # ex 9
