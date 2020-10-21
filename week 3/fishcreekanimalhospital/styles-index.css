@@ -1,16 +1,7 @@
 body {
-    background-color: lightcyan;
+    background-color: lightblue;
   }
-  header{
-    background-image: url(lighthouse.jpg);
-    background-size:  cover;
-    background-repeat:   no-repeat;
-    background-position: center center;
-    padding-top: 5%;
-  }
-  #text-logo{
-    color: black;
-  }
+
   nav {
     overflow: hidden;
     background-color: lightyellow;
@@ -34,26 +25,26 @@ body {
     background-color: #4CAF50;
     color: white;
   }
-  main{
-    padding-left: 1%;
-  }
+
   h1 {
-    color: black;
+    color: white;
     text-align: center;
   }
+
   h3 {
     font-family: verdana;
   }
+  
   p {
     font-family: verdana;
     font-size: 20px;
   }
-  ul{
-    list-style: square;
-  }
   a:link, a:visited{
     color:navy;
     text-decoration: none;
+  }
+  dt{
+    text-decoration: underline;
   }
   footer{
     background-color: lightyellow;

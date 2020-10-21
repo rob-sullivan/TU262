@@ -1,0 +1,21 @@
+body {
+    background-color: lightcyan;
+  }
+  
+  h1 {
+    color: black;
+    text-align: center;
+  }
+  h3 {
+    font-family: verdana;
+  }
+  p {
+    font-family: verdana;
+    font-size: 20px;
+  }
+  ul{
+    list-style: square;
+  }
+  footer{
+    background-color: lightyellow
+  }
