@@ -1,4 +1,4 @@
-#ex 1
+""" #ex 1
 x = 1
 while x < 11:
   print(x)
@@ -47,6 +47,10 @@ for i in range(1,6):
   for j in range(1, i+1):
     print("*", end = "")
   print()
+ """
+num = int(input("enter the number of rows:"))
+for i in range(1, num+1):
+  print(" "*(num-1)+"* "*i)
 
 # ex 9 a
 # ex 9
