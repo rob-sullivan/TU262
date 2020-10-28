@@ -15,6 +15,8 @@ footer {font-size:70%;
          clear: both;
          background:pink;
          height:40%;
+         display: flex;
+         align-items: center;
 
 }
 p{font: 15px Helvetica; padding:4px;}
