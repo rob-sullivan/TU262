@@ -1,0 +1,146 @@
+/*https://medium.com/swlh/how-i-use-css-grid-and-flexbox-to-create-a-one-page-website-262aeea3592a*/
+body {
+
+        grid-template-columns: auto auto auto;
+        grid-template-rows: auto auto auto;
+        background-color: lightsteelblue;
+        padding: 10px;
+
+        /*grid elements */
+        display: grid;
+        grid-template-rows: auto auto auto;
+        grid-template-columns: auto auto auto;
+
+}
+
+header {
+        background-color: darkgray;
+        padding: 20px;
+        text-align: center;
+        font-size: 18px;
+
+        /*grid elements */
+        grid-column:1/span 4; 
+        grid-row:1;
+
+        /* flexbox elements */
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+}
+#logo{
+        background-color: plum;
+        /* flexbox elements 
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        */
+        flex-grow: 2;
+    }
+#mid-spacer{
+        flex-grow: 5;
+}
+
+#topnav{
+        background-color: plum;
+        list-style: none;
+        margin-right: 5%;
+}
+        #topnav ul {
+                list-style-type: none;
+                overflow: hidden;
+                background-color: purple;
+        }
+        
+        #topnav li {
+                float: left;
+        }
+
+        #topnav li a {
+                display: block;
+                color: white;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+        }
+
+        /* Change the link color to #111 (black) on hover */
+        #topnav li a:hover {
+                background-color: #111;
+        }
+main{
+        background-color: cadetblue;
+        /*grid elements */
+        grid-column:1/span 3; 
+        grid-row:2; 
+}
+article{
+        background-color: yellowgreen;
+        margin-left: 2%;
+        margin-right: 2%;
+}
+aside{
+        background-color: sandybrown;
+        /*grid elements */
+        grid-column:4/span 1; 
+        grid-row:2;
+}
+aside .flex-container{
+        display: flex;
+        justify-content: center;
+}
+footer{
+        background-color: tomato;
+        /*grid elements */
+        grid-column:1/span 4; 
+        grid-row:3;
+        text-align: center;
+}
+
+/*mobile response */
+@media only screen and (max-width: 600px) {
+        body {
+
+                grid-template-columns: auto auto auto;
+                grid-template-rows: auto auto auto;
+                background-color: lightsteelblue;
+                padding: 10px;
+        
+                /*grid elements */
+                display: grid;
+                grid-template-rows: auto auto auto auto;
+                grid-template-columns: auto auto auto auto;
+        
+        }
+        header {
+                background-color: darkgray;
+                text-align: center;
+                font-size: 18px;
+        
+                /*grid elements */
+                grid-column:1/span 4; 
+                grid-row:1;
+
+        }
+        main{
+                background-color: cadetblue;
+                /*grid elements */
+                grid-column:1/span 4; 
+                grid-row:2; 
+        }
+        
+        aside{
+                background-color: sandybrown;
+                /*grid elements */
+                grid-column:1/span 4; 
+                grid-row:3;
+        }
+        footer{
+                background-color: tomato;
+                /*grid elements */
+                grid-column:1/span 4; 
+                grid-row:4;
+                text-align: center;
+        }
+}
