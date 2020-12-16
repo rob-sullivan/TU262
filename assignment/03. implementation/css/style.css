@@ -39,6 +39,7 @@ nav a{
     padding-top: 1%;
     padding-bottom: 1%;
     border-radius:2.5em;
+    border: 1px solid #00c8ff;
     
     /*put empty space around the nav buttons*/
     margin-top: 2%;
@@ -160,6 +161,33 @@ aside #action-button a:hover {
     background-color: #00c8ff;
     color: snow;
 }
+aside #top-button {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    z-index: 99;
+    font-size: 18px;
+    border: none;
+    
+    outline: none;
+    background-color: black;
+    border: 1px solid #00c8ff;
+    color: white;
+    cursor: pointer;
+
+    /*give rounded look*/
+    padding: 2px 35px;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    font-size: 17px;
+    border-radius:2.5em;
+    transition: all 1.5s;
+  }
+  
+  aside #top-button:hover {
+    background-color: #00c8ff;
+  }
 article{
     /*creates nice white background and
     takes up most of the site space.*/
@@ -221,132 +249,139 @@ section p, table{
     max-height: 150px;
 }
 
-.education-box {
+.experience-box {
     position: relative;
     padding-left: 20px;
-    margin-bottom: 45px; }
+    margin-bottom: 45px; 
+}
 
-    .education-box:before {
-      content: "";
-      top: 9px;
-      left: -1px;
-      position: absolute;
-      width: 4px;
-      height: 4px; }
-    .education-box:last-child:after {
-      top: 14px;
-      left: 0;
-      bottom: 0;
-      width: 1px;
-      content: '';
-      position: absolute; }
-  .education-date {
-    left: -20px;
-    width: 117px;
-    letter-spacing: 0;
-    line-height: 1.1;
-    padding: 6px 6px;
-    margin-left: 15px;
-    font-size: 0.625em;
-    position: relative;
-    display: inline-block; }
-    .education-date span {
-      overflow: hidden;
-      position: relative;
-      display: block;
-      white-space: nowrap; }
-    .education-date:before {
-      content: "";
-      top: 0;
-      right: 100%;
-      width: 0;
-      height: 0;
-      position: absolute;
-      border-top: 11px solid transparent !important;
-      border-bottom: 11px solid transparent !important;
-      border-left: 0px solid transparent !important;
-      border-right: 7px solid transparent; }
-  .education-logo {
-    margin-bottom: 5px; }
-  .education-company {
-    line-height: 1.1;
-    letter-spacing: 0;
-    font-size: 0.625em;
-    margin-bottom: 15px;
-    display: inline-block; }
-    .text-upper {
-        text-transform: uppercase; 
-    }
-    .education-box:before {
-        background-color: #010101; }
-        .education-company,
-        .ref-author span,
-        table > thead > tr > th,
-        .styled-ul > li > ul ul,
-        #crt-main-nav > ul > li > a,
-        #crt-main-nav-sm a,
-        .cr-carousel .slick-next:before,
-        .cr-carousel .slick-prev:before,
-        .widget_categories li,
-        .post-category-comment a {
-          color: #757575; }    
-    .education:before,
-  .education-date,
-  #crt-main-nav .sub-menu li > a:hover,
-  #crt-main-nav .sub-menu .current > a,
-  #crt-main-nav-sm .sub-menu:before {
-    background-color: #c0e3e7; }
-    @media (min-width: 768px) {
-        .education {
-          margin-left: 210px; }
-          .education:before {
-            top: 10px; }
-        .education-box {
-          padding-right: 90px; }
-          .education-box h3 {
-            font-size: 20px;
-            margin-bottom: 22px;
-            margin-top: 0; }
-          .education-box:before {
-            top: 10px; }
-        .education-date {
-          margin-left: 0;
-          margin-right: 22px;
-          padding: 8px 6px;
-          font-size: 0.875em;
-          text-align: center;
-          position: absolute;
-          width: 160px;
-          right: 100%;
-          left: auto;
-          top: -4px; }
-          .education-date:before {
-            display: none; }
-          .education-date:after {
-            content: " ";
-            top: 0;
-            left: 100%;
-            width: 0;
-            height: 0;
-            position: absolute;
-            border-top: 16px solid transparent !important;
-            border-bottom: 16px solid transparent !important;
-            border-right: 10px solid transparent !important;
-            border-left: 10px solid transparent; } }
-      
-      .education-logo {
-        margin-bottom: 10px; }
-      
-      .education-company {
-        font-size: 1em;
-        margin-bottom: 15px; }
-  
-        .education-date:after,
-        .education-date:before {
-          border-color: #c0e3e7; }
+.experience-box:before {
+  content: "";
+  top: 9px;
+  left: -1px;
+  position: absolute;
+  width: 4px;
+  height: 4px; 
+}
+.experience-box:last-child:after {
+  top: 14px;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  content: '';
+  position: absolute; 
+}
+.experience-date {
+  left: -20px;
+  width: 117px;
+  letter-spacing: 0;
+  line-height: 1.1;
+  padding: 6px 6px;
+  margin-left: 15px;
+  font-size: 0.625em;
+  position: relative;
+  display: inline-block; 
+}
+.experience-date span {
+  overflow: hidden;
+  position: relative;
+  display: block;
+  white-space: nowrap; 
+}
+.experience-date:before {
+  content: "";
+  top: 0;
+  right: 100%;
+  width: 0;
+  height: 0;
+  position: absolute;
+  border-top: 11px solid transparent !important;
+  border-bottom: 11px solid transparent !important;
+  border-left: 0px solid transparent !important;
+  border-right: 7px solid transparent; 
+}
+.experience-logo {
+  margin-bottom: 5px; 
+}
+.experience-company {
+  line-height: 1.1;
+  letter-spacing: 0;
+  font-size: 0.625em;
+  margin-bottom: 15px;
+  display: inline-block; 
+}
+.text-upper {
+    text-transform: uppercase; 
+}
+.experience-box:before {
+    background-color: #010101; 
+}
+.experience-company {
+  color: #757575; 
+}    
+.experience:before, .experience-date {
+  background-color: #c0e3e7; 
+}
+
+.experience {
+  margin-left: 210px; 
+}
+.experience:before {
+  top: 10px; 
+}
+.experience-box {
+  padding-right: 90px;
+}
+.experience-box h3 {
+  font-size: 20px;
+  margin-bottom: 22px;
+  margin-top: 0; 
+}
+.experience-box:before {
+  top: 10px; 
+}
+.experience-date {
+  margin-left: 0;
+  margin-right: 22px;
+  padding: 8px 6px;
+  font-size: 0.875em;
+  text-align: center;
+  position: absolute;
+  width: 160px;
+  right: 100%;
+  left: auto;
+  top: -4px; 
+}
+.experience-date:before {
+  display: none; 
+}
+.experience-date:after {
+  content: " ";
+  top: 0;
+  left: 100%;
+  width: 0;
+  height: 0;
+  position: absolute;
+  border-top: 16px solid transparent !important;
+  border-bottom: 16px solid transparent !important;
+  border-right: 10px solid transparent !important;
+  border-left: 10px solid transparent; 
+}
+
+.experience-logo {
+  margin-bottom: 10px; 
+}
+
+.experience-company {
+  font-size: 1em;
+  margin-bottom: 15px; 
+}
+
+.experience-date:after, .experience-date:before {
+  border-color: #c0e3e7; 
+}
 footer{
     background-color: #00c8ff;
     grid-column: 5/12;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
-
