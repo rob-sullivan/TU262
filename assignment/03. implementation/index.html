@@ -2,26 +2,31 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta name="description" content="robert o sullivan cv website">
 		<meta name="author" content="Robert O'Sullivan">
-		<title>Robert O'Sullivan Resume</title>
+		<!-- CSS files -->
 		<link rel="stylesheet" href="css/style.css">
 		<!-- Add icon library -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<title>Robert O'Sullivan Resume</title>
 	</head>
 	<body>
         <header>
-            <nav>			
+            <nav class="main-nav" id="main-nav">
+				<a href="javascript:void(0);" class="icon" onclick="mobileMenu()">
+					<i class="fa fa-bars"></i>
+				</a>			
 				<a href="#about-me">About Me</a>
 				<a href="#contact">Contact</a>
 				<a href="#skills">Skills</a>
 				<a href="#experience">Experience</a>
 				<a href="#education">Education</a>
-				<a href="#interests">Interests</a>		
+				<a href="#interests">Interests</a>	
 			</nav>
 		</header>
 		<aside>
-			<button onclick="topFunction()" id="top-button" title="Go to top"><i class="fa fa-arrow-up" aria-hidden="true"></i></button>
+			<button onclick="JumpToTop()" id="top-button" title="Go to top"><i class="fa fa-arrow-up" aria-hidden="true"></i></button>
 			<div id="avatar"><img src="img/rob.jpg" alt="Robert O'Sullivan"></div>
 			<div id="title"><h2>Robert O'Sullivan</h2></div>
 			<div id="subtitle"><h3>Project Engineer</h3></div>
@@ -30,15 +35,26 @@
 				<a href="https://twitter.com/rungekuttarob"><i class="fa fa-twitter"></i></a>
 				<a href="https://www.linkedin.com/in/roberto-sullivan/"><i class="fa fa-linkedin"></i></a>
 			</div>
-			<div id="action-button"><a href="https://drive.google.com/file/d/1mgiRSVN3zLnudg1Kgp7OZnkaeohk9Y-c/view?usp=sharing" target="_blank">Download CV</a></div> 
+			<div id="action-button"><a href="https://drive.google.com/file/d/15cxLcuY2yl_DmBNBPDAkA-OrysUg2qbJ/view?usp=sharing" target="_blank">Download CV</a></div> 
 		</aside>
         <article>
             <section id="about-me">
 				<h2 id="section-title">About Me</h2>
-				<p id="section-body"><strong>I'm Rob,</strong><br/><br/>Graduate Manufacturing Design and Automation Engineer with over 7 years’ experience in API pharmaceutical and now Medical sector. Project Engineer who worked in the following roles: process engineer, project manager, commissioning and validation engineer. Diligent and conscientious in these roles and pay attention to detail. Studying Computer Science part time with TU Dublin and interested in a career change into Automation Engineering or Software Development.</p>
+				<p id="section-body"><strong>I'm Rob,</strong><br/><br/>Graduate Manufacturing Design and Automation Engineer with over 7 years’ experience in API pharmaceutical and now Medical sector. Project Engineer who has worked as a process engineer, project manager, commissioning and validation engineer. Diligent and conscientious in these roles and pay attention to detail. Studying Computer Science part time with TU Dublin to pursue a career change into Automation Engineering or Software Development.</p>
 			</section>
             <section id="contact">
 				<h2>Contact</h2>
+				<p>
+					<form id="contact-form" name="ContactForm" onsubmit="return validateForm()" method="post">
+						<label>Name</label>
+						<input type="text" name="name">
+						<label>Email</label>
+						<input type="email" name="email">
+						<label>Message</label>
+						<textarea name="message"></textarea>
+						<input class="submit-button" type="submit" value="Send">
+   		 			</form>
+				</p>
 				<p>
 					<table>
 						<tr>
@@ -47,7 +63,7 @@
 						</tr>
 						<tr>
 							<td><i class="fa fa-envelope"></i></td>
-							<td>robertosullivan@gmail.com</td>
+							<td><a href="mailto:robertosullivan5@gmail.com?subject=Requesting%20Callback&body=Hi I wish to request a call back for a position I have available.">robertosullivan5@gmail.com</a></td>
 						</tr>
 						<tr>
 							<td><i class="fa fa-home"></i></td>
@@ -60,88 +76,260 @@
 				<h2>Skills</h2>
 				<h3>Engineering Skills</h3>
 				<div class="skill-flex-container">
-					<div><img src="https://instrumentationtools.com/wp-content/uploads/2020/01/Questions-on-Piping-and-Instrumentation-Diagrams.png" alt=""><br/>Piping and instrumentation design</div>
-					<div><img src="https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt=""><br/>Writing project funding proposal</div>
-					<div><img src="https://cdn.pixabay.com/photo/2016/03/15/09/08/quality-control-1257235__340.jpg" alt=""><br/>Change control management</div>  
-					<div><img src="https://cdn.pixabay.com/photo/2017/08/03/21/37/construction-2578410_1280.jpg" alt=""><br/>Vendor selection & management</div>
-					<div><img src="https://cdn.pixabay.com/photo/2017/08/11/10/40/industry-2630304_1280.png" alt=""><br/>Tender & Scope Work Creation</div>
-					<div><img src="https://cdn.pixabay.com/photo/2017/05/04/16/37/meeting-2284501_1280.jpg" alt=""><br/>HAZOP Attendace As Project Lead</div>  
-					<div><img src="https://cdn.pixabay.com/photo/2017/09/26/16/14/savings-2789153_1280.jpg" alt=""><br/>Cost Control & Budget Report creation</div>
-					<div><img src="https://cdn.pixabay.com/photo/2018/02/02/17/14/triangle-3125882_1280.jpg" alt=""><br/>Management of Multiple Projects Simultaneously</div>
-					<div><img src="https://cdn.pixabay.com/photo/2013/07/12/18/36/agenda-153555_1280.png" alt=""><br/>Monitoring Project Schedule & Target Completion</div>  
-					<div><img src="https://cdn.pixabay.com/photo/2017/09/15/19/41/businessman-2753324__340.jpg" alt=""><br/>Supervision of Multi-Disciplinary Personnel</div>
-					<div><img src="https://cdn.pixabay.com/photo/2017/12/02/16/19/mechanical-engineering-2993233__340.jpg" alt=""><br/>Project Commissioning & Qualification (C&Q)</div>
-					<div><img src="https://cdn.pixabay.com/photo/2019/03/14/22/12/blueprint-4056027__340.jpg" alt=""><br/>AutoCad</div>
-					<div><img src="https://cdn.pixabay.com/photo/2016/07/27/13/26/turboventilator-1545293__340.jpg" alt=""><br/>Solid Works Packages</div> 
-					<div><img src="https://www.cadcrowd.com/slides/1568974873FEA_analysis_-_Judy_Moody.jpg" alt=""><br/>Finite Element Analysis Packages</div>
-					<div><img src="https://i.pinimg.com/originals/57/9f/2c/579f2c7f29cab8c5218a3e5ec8a63078.jpg" alt=""><br/>Flow Simulation Analysis Packages for Mechanical Design</div>
+					<div><img src="img/Questions-on-Piping-and-Instrumentation-Diagrams.png" alt=""><br/>Piping and instrumentation design</div>
+					<div><img src="img/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt=""><br/>Writing project funding proposal</div>
+					<div><img src="img/quality-control-1257235__340.webp" alt=""><br/>Change control management</div>  
+					<div><img src="img/construction-2578410_1280.jpg" alt=""><br/>Vendor selection & management</div>
+					<div><img src="img/industry-2630304_1280.png" alt=""><br/>Creation of Tender Packs & Performance Specification</div>
+					<div><img src="img/meeting-2284501_1280.jpg" alt=""><br/>HAZOP Attendance As Project Lead</div>  
+					<div><img src="img/savings-2789153_1280.jpg" alt=""><br/>Cost Control & Budget Report creation</div>
+					<div><img src="img/triangle-3125882_1280.jpg" alt=""><br/>Management of Multiple Projects Simultaneously</div>
+					<div><img src="img/agenda-153555_1280.png" alt=""><br/>Monitoring Project Schedule & Target Completion</div>  
+					<div><img src="img/businessman-2753324__340.webp" alt=""><br/>Supervision of Multi-Disciplinary Personnel</div>
+					<div><img src="img/mechanical-engineering-2993233__340.webp" alt=""><br/>Project Commissioning & Qualification (C&Q)</div>
+					<div><img src="img/blueprint-4056027__340.jpg" alt=""><br/>AutoCad</div>
+					<div><img src="img/turboventilator-1545293__340.jpg" alt=""><br/>Solid Works Packages</div> 
+					<div><img src="img/1568974873FEA_analysis_-_Judy_Moody.jpg" alt=""><br/>Finite Element Analysis Packages</div>
+					<div><img src="img/579f2c7f29cab8c5218a3e5ec8a63078.jpg" alt=""><br/>Flow Simulation Analysis Packages for Mechanical Design</div>
 				  </div>
 				  <h3>Software Skills</h3>
 				  <div class="skill-flex-container">
-					<div><img src="https://aventislearning.com/wp-content/uploads/2019/05/Excel-VBA-2-e1558600807829.jpeg" alt=""><br/>Excel including VBA</div>
-					<div><img src="https://tr1.cbsistatic.com/hub/i/r/2020/03/11/cb9a0b88-0be6-4a14-ad02-80b2c1963eb7/resize/1200x/fc2117c19dafaca8b423d6fe433e58cd/word-1.jpg" alt=""><br/>Word</div>  
-					<div><img src="https://www.oswego.edu/cts/sites/www.oswego.edu.cts/files/styles/panopoly_image_original/public/visio-stencils_0.jpg" alt=""><br/>Visio</div>
-					<div><img src="https://venturebeat.com/wp-content/uploads/2016/08/Microsoft-Outlook-logo.jpg" alt=""><br/>Outlook</div>
-					<div><img src="https://thecounselormovie.com/wp-content/uploads/2020/05/Microsoft-PowerPoint-3.jpg" alt=""><br/>PowerPoint</div>  
-					<div><img src="https://www.360-systems.com/media/1150/sharepoint.png" alt=""><br/>SharePoint</div>
-					<div><img src="https://tecnologia.culturamix.com/blog/wp-content/uploads/2019/05/MS-Project.png" alt=""><br/>MS Project</div>
-					<div><img src="https://www.uniteambd.com/wp-content/uploads/2018/12/omron-plc.jpg" alt=""><br/>Omron PLCs</div>  
-					<div><img src="https://malisko.com/wp-content/uploads/2017/05/platforms-01.png" alt=""><br/>Allen Bradley PLCs</div>
-					<div><img src="https://datawider.com/wp-content/uploads/2019/11/How-to-Learn-Python.jpg" alt=""><br/>Python</div>
-					<div><img src="https://miro.medium.com/max/3840/0*xlmhNwFqRL0pBZfR.jpg" alt=""><br/>C#</div>
-					<div><img src="https://www.technotification.com/wp-content/uploads/2018/06/the-magic-of-javascript.jpg" alt=""><br/>JavaScript</div> 
-					<div><img src="https://lastmomenttuitions.com/wp-content/uploads/2019/08/sql-thumbnail-1.jpg" alt=""><br/>SQL databases</div>
-					<div><img src="https://image.slidesharecdn.com/davidlicenvuejs-slides-170526074856/95/vuejs-introduction-1-638.jpg" alt=""><br/>Vue.js</div>
+					<div><img src="img/Excel-VBA-2-e1558600807829.jpeg" alt=""><br/>Excel including VBA</div>
+					<div><img src="img/word-1.jpg" alt=""><br/>Word</div>  
+					<div><img src="img/visio-stencils_0.jpg" alt=""><br/>Visio</div>
+					<div><img src="img/Microsoft-Outlook-logo.jpg" alt=""><br/>Outlook</div>
+					<div><img src="img/Microsoft-PowerPoint-3.jpg" alt=""><br/>PowerPoint</div>  
+					<div><img src="img/sharepoint.png" alt=""><br/>SharePoint</div>
+					<div><img src="img/MS-Project.png" alt=""><br/>MS Project</div>
+					<div><img src="img/omron-plc.jpg" alt=""><br/>Omron PLCs</div>  
+					<div><img src="img/platforms-01.png" alt=""><br/>Allen Bradley PLCs</div>
+					<div><img src="img/How-to-Learn-Python.jpg" alt=""><br/>Python</div>
+					<div><img src="img/0_xlmhNwFqRL0pBZfR.jpg" alt=""><br/>C#</div>
+					<div><img src="img/the-magic-of-javascript.jpg" alt=""><br/>JavaScript</div> 
+					<div><img src="img/sql-thumbnail-1.jpg" alt=""><br/>SQL databases</div>
+					<div><img src="img/vuejs-introduction-1-638.jpg" alt=""><br/>Vue.js</div>
 				  </div>
 			</section>
 			<section id="experience">
 				<h2>Experience</h2>
-				<div class="experience">
+				<div class="experience-container">
 					<div class="experience-box">
 						<time class="experience-date" datetime="2014-01T2016-03">
-							<span>Jan <strong class="text-upper">2014</strong> - Mar <strong>2016</strong></span>
+							<span>Apr <strong class="text-upper">2020</strong> - Present</span>
 						</time>
-						<h3>Full Stack Developer</h3>
+						<h3 class="experience-date-mobile">Apr <strong class="text-upper">2020</strong> - Present</h3>
+						<h3>Project Engineer - Client BD Medical</h3>
 						<div class="experience-logo">
-							<img src="https://via.placeholder.com/150" alt="">
+							<img src="img/OG_Facebook.png" alt="">
 						</div>
-						experience						<p>Your brand is the core of your marketing,
-						the central theme around your products and services.
-						Your brand is not your Logo or your Company Name
-						</p>
-					</div>	
+						PM Group, Killakee House, Dublin 24<p>Manage energy cost saving projects e.g. installation of a new Absorption Chiller, upgrading Building Management System. Model current state to benchmark savings to apply for energy grants and credits. Generate feasibility, URS, costing and schedules then tender out work and report progress and savings to senior leadership team.</p>
+					</div>
+					<div class="experience-box">
+						<time class="experience-date" datetime="2014-01T2016-03">
+							<span>Apr <strong class="text-upper">2020</strong> - Apr <strong class="text-upper">2020</strong></span>
+						</time>
+						<h3 class="experience-date-mobile">Apr <strong class="text-upper">2020</strong> - Present</h3>
+						<h3>Project Consultant</h3>
+						<div class="experience-logo">
+							<img src="img/logo.jpeg" alt="">
+						</div>
+						Open Source Ventilator Ireland, Sandyford, Dublin 18<p>Worked with the open source ventilator community and their leadership to help front line staff combat covid19 such as improving automated ambu bag ventilators. The group was doing this by improving on MIT and Rice university design, explored designs for an online calculator to help staff branch ventilators, developing cheatsheet guides to upskilling staff quickly on the use of ventilators and many more open source projects.</p>
+					</div>
+					<div class="experience-box">
+						<time class="experience-date" datetime="2014-01T2016-03">
+							<span>May <strong class="text-upper">2017</strong> - Apr <strong class="text-upper">2020</strong></span>
+						</time>
+						<h3 class="experience-date-mobile">May <strong class="text-upper">2017</strong> - Apr <strong class="text-upper">2020</strong></h3>
+						<h3>Project Manager - Client Astellas Pharmaceuticals</h3>
+						<div class="experience-logo">
+							<img src="img/logonewer-255x300.jpg" alt="">
+						</div>
+						eProSys Ltd, Blackrock, Co. Dublin<p>Managed a small team to remove an Incinerator from Astellas. Scoped work with stakeholders to go out to tender and get mech, elec and civil prices. Engaged consultants for EPA demolition management plan, detailed analysis was carried out for waste plan, health and safety plan and cleaning protocol for different hazardous and nonhazardous lines to be cleaned by specialist cleaning contractor. Appointed main mechanical contractor before covid-19.</p>
+						<h3>Project Engineer - Client Astellas Pharmaceuticals</h3>
+						<div class="experience-logo">
+							<img src="img/logonewer-255x300.jpg" alt="">
+						</div>
+						eProSys Ltd, Blackrock, Co. Dublin<p>Completed an API capacity increase project for Astellas. This involved working with a project manager to create schedules and performance specification, presented to management then went out to tender for mech, elect and civil contractors. Reviewed drawings and calculations for mechanical tie in line locations, wrote design specification documents for vessels, pumps. Created datasheets for instruments. Managed vendors with request for quotation, technical bid analysis and PO generation. Managed technical changes with maintenance, production and automation. Wrote and executed commissioning & validation documents. Managed the scope change process. Delivered on projects including a new glycol tank, bund and pump, a metering pump, new waste solvent lines, locker room upgrade, cold store refrigerator installed in warehouse with a forklift truck, extra portacabin office with training room facilities, new bund wave deflector plates, divert wall and concrete paths in solvent recovery. Wrote and executed commissioning & validation documents for an automated glovebox containment filling unit as part of a containment project.<br /><br />Assisting Astellas with preparations prior to kicking-off a Preliminary Engineering design stage for a high containment manufacturing facility. Preparation of pre-qualification documentation to be issued to a number of A&E companies under the guidance of the Project Manager. Preparation of document control system to support the kick-off of the project later in the year.</p>
+						<h3>Project Engineer - Client SK Biotech</h3>
+						<div class="experience-logo">
+							<img src="img/logonewer-255x300.jpg" alt="">
+						</div>
+						eProSys Ltd, Blackrock, Co. Dublin<p>Supported SK Biotech with updating and transferring their engineering standards, along with project management documentation through their DCA. Managed project closeout items of a wastewater treatment plant project such as piping mechanical and electrical test-packs with contractors, managed CMMS asset registration and advanced change controls to close out in Trackwise. Document controller during design stage of a plant expansion project and worked with various contractors.</p>
+					</div>
+					<div class="experience-box">
+						<time class="experience-date" datetime="2014-01T2016-03">
+							<span>Sep <strong class="text-upper">2017</strong> - Sep <strong class="text-upper">2018</strong></span>
+						</time>
+						<h3 class="experience-date-mobile">Sep <strong class="text-upper">2017</strong> - Sep <strong class="text-upper">2018</strong></h3>
+						<h3>Lecturer in User Experience App Design</h3>
+						<div class="experience-logo">
+							<img src="img/Pulse-College-504x224.jpeg" alt="">
+						</div>
+						Pulse College, Ringsend, Dublin 4<p>Taught UX design and app development, part time for a Diploma Course. Class of 20 students. Mix of presentations and in class projects. Adapted the course to introduce students to virtual reality and augmented reality designs.</p>
+					</div>
+					<div class="experience-box">
+						<time class="experience-date" datetime="2014-01T2016-03">
+							<span>Jul <strong class="text-upper">2015</strong> - Jul <strong class="text-upper">2016</strong></span>
+						</time>
+						<h3 class="experience-date-mobile">Jul <strong class="text-upper">2015</strong> - Jul <strong class="text-upper">2016</strong></h3>
+						<h3>Project Engineer - Client Bristol Myers Squibb</h3>
+						<div class="experience-logo">
+							<img src="img/8JiP0nYV_400x400.jpg" alt="">
+						</div>
+						DPS Engineering Group, Citywest, Dublin 24<p>Co-ordinated site master plan with various A&E companies	. Managed equipment procurement with various vendors for a reactor replacement project. Co-ordinated and managed construction walkdowns on the project. Managed piping mechanical and electrical test-packs with contractors. Tracked and advanced change controls through Trackwise. Involved in an agitator replacement, bottom outlet valves replacement, acid storage-tank and pump skid install project.</p>
+						<h3>C&Q Engineer - Client Bristol Myers Squibb</h3>
+						<div class="experience-logo">
+							<img src="img/8JiP0nYV_400x400.jpg" alt="">
+						</div>
+						DPS Engineering Group, Citywest, Dublin 24<p>Drafted and executed IVs, FVs and IOQs on various projects (mentioned above). Closed out and coordinated these protocols with QA. Co-ordinated maintenance activities for handback of plant after project completion. </p>
+					</div>
+					<div class="experience-box">
+						<time class="experience-date" datetime="2014-01T2016-03">
+							<span>June <strong class="text-upper">2013</strong> - Jul <strong class="text-upper">2015</strong></span>
+						</time>
+						<h3 class="experience-date-mobile">June <strong class="text-upper">2013</strong> - Jul <strong class="text-upper">2015</strong></h3>
+						<h3>Process Engineer & Project Engineer</h3>
+						<div class="experience-logo">
+							<img src="img/helsinn_company.jpg" alt="">
+						</div>
+						Helsinn Birex Pharmaceutical, Mulhuddart, Dublin 15<p>Assisted facilities day-to-day activities, managed sub-contractors, purchase orders and CAPAS. Organised master schedules for calibrations. Assisted automation department on functional design specification documents. Designed and implemented a custom maintenance reporting system using Visual Basic to report metrics from CSV data improving planning of resources and department reporting. Worked with a team of 7 technicians to implement an OpEx project to realign the engineering store inventory with CMMS. Generated SOPs to operate and maintain this system. Generated SOPs for control of hazardous energies for EHS as per OSHA requirements.</p>
+					</div>
+					<div class="experience-box">
+						<time class="experience-date" datetime="2014-01T2016-03">
+							<span>June <strong class="text-upper">2010</strong> - Aug <strong>2010</strong></span>
+						</time>
+						<h3 class="experience-date-mobile">June <strong class="text-upper">2010</strong> - Aug <strong class="text-upper">2010</strong></h3>
+						<h3>Research Assistant</h3>
+						<div class="experience-logo">
+							<img src="img/Trinity_College_Dublin_Logo.png" alt="">
+						</div>
+						TCD, College Green, Dublin 2 <p>Worked in Dept. of Mechanical & Manufacturing Engineering over the summer. Assisted PhD and master’s degree students with their research into wear testing, compressor room efficiency, plasma cutting, laser cutting and water jet cutting. Built a 3d printer for physics department.</p>
+					</div>
 				</div>
 			</section>
 			<section id="education">
 				<h2>Education</h2>
-				<p><strong>I'm Rob,</strong><br/><br/>A Graduate Manufacturing Design and Automation Engineer with over 7 years’ experience in API pharmaceutical and now Medical sector. Project Engineer who worked in the following roles: project management, commissioning and validation engineer and process engineer. Diligent and conscientious in these roles and pay attention to detail.</p>
+				<div class="education-container">
+					<div class="education-box">
+						<time class="education-date" datetime="2014-01T2016-03">
+							<span><strong class="text-upper">2020</strong> - <strong>2021</strong></span>
+						</time>
+						<h3 class="education-date-mobile"><strong class="text-upper">2020</strong> - <strong class="text-upper">2021</strong></h3>
+						<h3>HDIP in Computer Science (Masters Qualifier)</h3>
+						<div class="education-logo">
+							<img src="img/yTWRjhN6_400x400.jpg" alt="">
+						</div>
+						TU Dublin
+						<p>
+							Part time Diploma Course starting in September 2020
+							<br />
+							Subjects Taken:
+							<ol>
+								<li>Object-Oriented Software Development</li>
+								<li>Information Systems</li>
+								<li>Architecture, Operating Systems and Networks</li>
+								<li>Web and User Interface Design</li>
+								<li>Systems Analysis and Testing</li>
+							</ol>
+						</p>
+					</div>
+					<div class="education-box">
+						<time class="education-date" datetime="2014-01T2016-03">
+							<span><strong class="text-upper">2012</strong> - <strong>2014</strong></span>
+						</time>
+						<h3 class="education-date-mobile"><strong class="text-upper">2012</strong> - <strong class="text-upper">2014</strong></h3>
+						<h3>BEng (Hons) Manufacturing Design Engineering</h3>
+						<div class="education-logo">
+							<img src="img/yTWRjhN6_400x400.jpg" alt="">
+						</div>
+						TU Dublin
+						<p>
+							Full time BEng,
+							<br />
+							Final year project Telemetry and Data Acquisition of a Formula Student Racecar.
+							<br />
+							Subjects Taken:
+							<ol>
+								<li>Advanced Design and Machining</li>
+								<li>Computer Aided Design</li>
+								<li>Control Engineering</li>
+								<li>Design & Team Building</li>
+								<li>Design and Manufacture</li>
+								<li>Engineering Management</li>
+								<li>Engineering Materials</li>
+								<li>Engineering Maths</li>
+								<li>Integrated Network Automation Systems</li>
+								<li>Manufacturing Engineering</li>
+								<li>Manufacturing Operations Management</li>
+								<li>Materials Properties & Process</li>
+								<li>Mechanical Systems Design</li>
+								<li>Medical Devices</li>
+								<li>Micro and Nano Manufacturing</li>
+								<li>Operations Management</li>
+								<li>Professional Development</li>
+								<li>Quality and Reliability</li>
+								<li>Quality and Reliability</li>
+								<li>Thermofluids</li>
+								<li>Tool Design & Metal Forming</li>
+							</ol>
+							
+						</p>
+					</div>
+					<div class="education-box">
+						<time class="education-date" datetime="2014-01T2016-03">
+							<span><strong class="text-upper">2008</strong> - <strong>2011</strong></span>
+						</time>
+						<h3 class="education-date-mobile"><strong class="text-upper">2008</strong> - <strong>2011</strong></h3>
+						<h3>BEng Tech Automation Engineering</h3>
+						<div class="education-logo">
+							<img src="img/yTWRjhN6_400x400.jpg" alt="">
+						</div>
+						TU Dublin
+						<p>
+							Full Time BEngTech
+							<br />
+							Final Year Thesis: Design and analysis of a wear testing rig for material testing
+							<br />
+							Subjects Taken:
+							<ol>
+								<li>Automation Systems </li>
+								<li>Automation Technology</li>
+								<li>Business Management</li>
+								<li>Cad & IT</li>
+								<li>Communications</li>
+								<li>Electrical Systems</li>
+								<li>Electronic Systems</li>
+								<li>Industrial Automation</li>Industrial Automation
+								<li>Manufacturing Management</li>
+								<li>Manufacturing Systems</li>
+								<li>Maths</li>
+								<li>Mechanical Systems</li>
+								<li>Mechatronics</li>
+								<li>Systems Integration</li>
+							</ol>
+						</p>
+					</div>
+				</div>
 			</section>
 			<section id="interests">
 				<h2>Interests</h2>
-				<p><strong>i'm Rob,</strong><br/><br/>A Graduate Manufacturing Design and Automation Engineer with over 7 years’ experience in API pharmaceutical and now Medical sector. Project Engineer who worked in the following roles: project management, commissioning and validation engineer and process engineer. Diligent and conscientious in these roles and pay attention to detail.</p>
+				<p>Interested in flying aircraft, engineering and artificial intelligence. Run the coding night making apps at my local hackerspace and contribute to other projects in my spare time. </p>
+				<div class="interest-flex-container">
+					<div><a href="https://www.trimflyingclub.ie/"><img src="img/rob3.jpg" alt=""><br/>Flying with Trim Flying Club</a></div>
+					<div><a href="https://www.engineersireland.ie/"><img src="img/450253c4207EDNthumbimg-ei-logo.png" alt=""><br/>Contributing to Engineer's Ireland</a></div>
+					<div><a href="https://www.tog.ie/"><img src="img/BgqzVKRg_400x400.jpg" alt=""><br/>Working on projects at Tog Hackerspace</a></div>
+					<div><iframe max-width="560" max-height="315" src="https://www.youtube.com/embed/zbcbhBMyKJ8?start=5342" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>Talking about Artificial intelligence</div>
+					<div><a class="weatherwidget-io" href="https://forecast7.com/en/53d35n6d26/dublin/" data-label_1="DUBLIN" data-label_2="WEATHER" data-theme="original" >Dublin Weather</a>Making web applications like this</div>
+				  </div>
 			</section>
         </article>
-		<footer>&copy; Robert O'Sullivan 2020</footer>
+		<footer><p>&copy; Robert O'Sullivan 2020</p></footer>
+		<!-- Javascript files -->
+		<script type="text/javascript" src="js/mobile_menu.js"></script>
+		<script type="text/javascript" src="js/to_top.js"></script>
+		<script type="text/javascript" src="js/form_val.js"></script>
 		<script>
-			//Get the button
-			var mybutton = document.getElementById("top-button");
-			
-			// When the user scrolls down 20px from the top of the document, show the button
-			window.onscroll = function() {scrollFunction()};
-			
-			function scrollFunction() {
-			  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-				mybutton.style.display = "block";
-			  } else {
-				mybutton.style.display = "none";
-			  }
-			}
-			
-			// When the user clicks on the button, scroll to the top of the document
-			function topFunction() {
-			  document.body.scrollTop = 0;
-			  document.documentElement.scrollTop = 0;
-			}
+			!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
 		</script>
     </body>
 </html>
