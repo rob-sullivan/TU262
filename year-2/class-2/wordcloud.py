@@ -1,0 +1,2 @@
+def numOfOccurance(x):
+    #code
