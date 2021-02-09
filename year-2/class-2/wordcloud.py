@@ -1,7 +1,7 @@
 import string # string.punctuation '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 #allchar = string.ascii_letters + string.punctuation + string.digits
 
-commonWords = "the of and a to in is you that it he was for on are as with his they I at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if will up other about out many then them these so some her would make like him into time has look two more write go see number no way could people my than first water been call who oil its now find long down day did get come made may part"
+stopWords = "ourselves hers between yourself but again there about once during out very having with they own an be some for do its yours such into of most itself other off is s am or who as from him each the themselves until below are we these your his through don nor me were her more himself this down should our their while above both up to ours had she all no when at any before them same and been have in will on does yourselves then that because what over why so can did not now under he you herself has just where too only myself which those i after few whom t being if theirs my against a by doing it how further was here than"
 #we create our dictionary and two functions to get data from it and to add data to it.
 wordCloudInc = {}
 wordCloudExc = {}
@@ -23,7 +23,7 @@ def wordParser(file):
                         parsedWord += " "
                     else:
                         parsedWord += char
-            if parsedWord not in commonWords:
+            if parsedWord not in stopWords:
                 wordCloudExc[parsedWord] = len(parsedWord)
             wordCloudInc[parsedWord] = len(parsedWord)
 
@@ -92,7 +92,7 @@ def writeFile(fileName, word_cloud_in, word_cloud_out):
 
                     <!-- Header -->
                     <div class="header">
-                        <h1>Common Words Included</h1>
+                        <h1>Stop Words Included</h1>
                     </div>
 
                     <!-- Generated Word Cloud -->
@@ -106,7 +106,7 @@ def writeFile(fileName, word_cloud_in, word_cloud_out):
 
                     <!-- Header -->
                     <div class="header">
-                        <h1>Common Words Removed</h1>
+                        <h1>Stop Words Removed</h1>
                     </div>
 
                     <!-- Generated Word Cloud -->
