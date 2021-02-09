@@ -1,12 +1,10 @@
 import string # string.punctuation '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 #allchar = string.ascii_letters + string.punctuation + string.digits
-#we create our dictionary and two functions to get data from it and to add data to it.
-wordCloud = {}
-def setWordCloudValue(key, value):
-    wordCloud[key] = value
 
-def getWordCloudValue(key):
-    return wordCloud[key]
+commonWords = "the of and a to in is you that it he was for on are as with his they I at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if will up other about out many then them these so some her would make like him into time has look two more write go see number no way could people my than first water been call who oil its now find long down day did get come made may part"
+#we create our dictionary and two functions to get data from it and to add data to it.
+wordCloudInc = {}
+wordCloudExc = {}
 
 def readFile(fileName):
     currentFile = open(fileName, 'r', encoding="utf-8")
@@ -21,36 +19,121 @@ def wordParser(file):
             parsedWord = ""
             for char in word:
                 if char not in string.punctuation:
-                    if char != "—": #remove this char (not in punctuation)
+                    if char == "—": #remove this char (not in punctuation)
+                        parsedWord += " "
+                    else:
                         parsedWord += char
-            wordCloud[parsedWord] = len(parsedWord)
+            if parsedWord not in commonWords:
+                wordCloudExc[parsedWord] = len(parsedWord)
+            wordCloudInc[parsedWord] = len(parsedWord)
 
-def writeFile(fileName, word_cloud):
+def writeFile(fileName, word_cloud_in, word_cloud_out):
     currentFile = open(fileName, 'w', encoding="utf-8")
     print(""" 
             <!DOCTYPE html>
             <html>
-                <head lang="en">
-                    <meta charset="UTF-8">
-                    <title>Tag Cloud Generator</title>
-                </head>
+                <style>
+                    * {
+                    box-sizing: border-box;
+                    }
+
+                    body {
+                    margin: 0;
+                    font-family: Arial;
+                    }
+
+                    .header {
+                    text-align: center;
+                    padding: 32px;
+                    }
+
+                    .row {
+                    display: -ms-flexbox; /* IE10 */
+                    display: flex;
+                    -ms-flex-wrap: wrap; /* IE10 */
+                    flex-wrap: wrap;
+                    padding: 0 4px;
+                    }
+
+                    /* Create four equal columns that sits next to each other */
+                    .column {
+                    -ms-flex: 25%; /* IE10 */
+                    flex: 25%;
+                    max-width: 25%;
+                    padding: 0 4px;
+                    }
+
+                    .column img {
+                    margin-top: 8px;
+                    vertical-align: middle;
+                    width: 100%;
+                    }
+
+                    /* Responsive layout - makes a two column-layout instead of four columns */
+                    @media screen and (max-width: 800px) {
+                    .column {
+                        -ms-flex: 50%;
+                        flex: 50%;
+                        max-width: 50%;
+                    }
+                    }
+
+                    /* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+                    @media screen and (max-width: 600px) {
+                    .column {
+                        -ms-flex: 100%;
+                        flex: 100%;
+                        max-width: 100%;
+                    }
+                    }
+                </style>
+
                 <body>
-                    <div style="text-align: center; vertical-align: middle; font-family: arial; color: white; background-color:black; border:1px solid black">
+
+                    <!-- Header -->
+                    <div class="header">
+                        <h1>Common Words Included</h1>
+                    </div>
+
                     <!-- Generated Word Cloud -->
-            """, file=currentFile)
-    print("                    " + wordCloudEncoder(word_cloud), file=currentFile)
-    print(""" 
+                    <div style="text-align: center; vertical-align: middle; font-family: arial; color: white; background-color:black; border:1px solid black">
+                        <div class="row"> 
+                            <div class="column">""", file=currentFile)
+    print("                    " + wordCloudEncoder(word_cloud_in), file=currentFile)
+    print("""               </div>
+                        </div>
+                    </div>
+
+                    <!-- Header -->
+                    <div class="header">
+                        <h1>Common Words Removed</h1>
+                    </div>
+
+                    <!-- Generated Word Cloud -->
+                    <div style="text-align: center; vertical-align: middle; font-family: arial; color: white; background-color:black; border:1px solid black">
+                        <div class="row"> 
+                            <div class="column">""", file=currentFile)
+    print("                    " + wordCloudEncoder(word_cloud_out), file=currentFile)
+    print("""               </div>
+                        </div>
+                    </div>
                 </body>
             </html>
     """, file=currentFile)
     currentFile.close()
 
 def wordCloudEncoder(d):
+    x = 0
     htmlWordCloud = ""
     for key in d:
-        htmlWordCloud += "<span style='font-size:" + str(d[key]*10) + "px'>" + key + "</span><br />"
+        if x % 6:
+            htmlWordCloud += "</div><div class='column'>"
+            htmlWordCloud += "<span style='font-size:" + str(d[key]*5) + "px'>" + key + "</span><br />"
+        else:
+            htmlWordCloud += "<span style='font-size:" + str(d[key]*5) + "px'>" + key + "</span><br />"
+        x += 1
     return(htmlWordCloud)
 
 
 readFile("gettysburg.txt")
-writeFile("gettysburg.html", wordCloud)
+writeFile("gettysburg.html", wordCloudInc, wordCloudExc)
