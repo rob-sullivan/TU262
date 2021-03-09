@@ -82,10 +82,6 @@ def clear():
     else: 
         _ = system('clear') 
 
-def update_info():
-    print("update book")
-    check_user_finished()
-
 def add_book():
     print("book to add")
     check_user_finished()
@@ -172,7 +168,7 @@ def show_books():
         x = int(input("Library Menu: Choose an option: ")) #try catch to make sure not null
         if(x == 0):
             clear()
-            print("returning to main menu...")
+            print(Color("{autoblue}Returning to Main Menu{/autoblue}"))
             input("Press Enter to continue...")
             main_menu()
         elif(x == 1):
@@ -223,13 +219,14 @@ def rent_book():
     rented_table = [
         ['ISBN-13', 'Title', 'Author', 'Qty'],
     ]    
-        # we loop through books and add each book to the ascii table
-    for isbn in books_rented:
-        #find and colour code quantity
-        qty = Color("{autoblue}" + str(books_rented[isbn][2]) + "{/autoblue}")
-        b_row = [isbn, books_rented[isbn][0], books_rented[isbn][1], qty] # we add a book per row
-        rented_table.append(b_row) # we add a row to the table using append. which will add to end of dictionary
-        rented = AsciiTable(rented_table) # we add the library table in an ascii table format
+    # we loop through rented books and add each book to the ascii table if they exist
+    if(len(books_rented) > 0):
+        for isbn in books_rented:
+            #find and colour code quantity
+            # qty = Color("{autoblue}" + str(books_rented[isbn][2]) + "{/autoblue}")
+            b_row = [isbn, books_rented[isbn][0], books_rented[isbn][1], books_rented[isbn][2]] # we add a book per row
+            rented_table.append(b_row) # we add a row to the table using append. which will add to end of dictionary
+    rented = AsciiTable(rented_table) # we add the library table in an ascii table format
 
     rented.title = Color("{autoblue}Rented{/autoblue}") + " Books : Showing " + str(len(books_rented)) + " Books"
     print(rented.table + " \n") # we print our ascii table library
@@ -244,7 +241,7 @@ def rent_book():
         x = int(input("ISBN-13: "))
         if(x == 0):
             clear()
-            print("returning to Library Menu...")
+            print(Color("{autoblue}Returning to Library Menu{/autoblue}"))
             input("Press Enter to continue...")
             show_books()
         elif(len(str(x)) == 13):
@@ -315,15 +312,16 @@ def return_book():
     # we setup the rented table and its header
     rented_table = [
         ['ISBN-13', 'Title', 'Author', 'Qty'],
-    ]    
-        # we loop through books and add each book to the ascii table
-    for isbn in books_rented:
-        #find and colour code quantity
-        qty = Color("{autoblue}" + str(books_rented[isbn][2]) + "{/autoblue}")
-        b_row = [isbn, books_rented[isbn][0], books_rented[isbn][1], qty] # we add a book per row
-        rented_table.append(b_row) # we add a row to the table using append. which will add to end of dictionary
-        rented = AsciiTable(rented_table) # we add the library table in an ascii table format
+    ]
 
+    # we loop through rented books and add each book to the ascii table if they exist
+    if(len(books_rented) > 0):
+        for isbn in books_rented:
+            #find and colour code quantity
+            # qty = Color("{autoblue}" + str(books_rented[isbn][2]) + "{/autoblue}")
+            b_row = [isbn, books_rented[isbn][0], books_rented[isbn][1], books_rented[isbn][2]] # we add a book per row
+            rented_table.append(b_row) # we add a row to the table using append. which will add to end of dictionary
+    rented = AsciiTable(rented_table) # we add the library table in an ascii table format
     rented.title = Color("{autoblue}Rented{/autoblue}") + " Books : Showing " + str(len(books_rented)) + " Books"
     print(rented.table + " \n") # we print our ascii table library
     
@@ -337,35 +335,121 @@ def return_book():
         x = int(input("ISBN-13: "))
         if(x == 0):
             clear()
-            print("returning to Library Menu...")
+            print(Color("{autoblue}Returning to Library Menu{/autoblue}"))
             input("Press Enter to continue...")
             show_books()
         elif(len(str(x)) == 13):
-            
-            # get book from book dictionary and check qty
+            # get book from rented book dictionary and check qty
+            qty = books_rented[isbn][2]
             book_name = books_rented[isbn][0]
-            if(qty > 0): #book in stock let user rent it
-                # ask user are they sure they want to rent
-                x = int(input("Rent: " + book_name + "? (Yes: 1. No: 0): "))
-                if(x == 0):
-                    rent_book()
-                elif(x == 1):       
-                    # deduct qty from rented book dictionary
-                    books_rented[isbn][2] -= 1
 
-                    # return rented book to books dictionary
-                    books[isbn] = [books_rented[isbn][0],books_rented[isbn][1], (books_rented[isbn][0] + 1)]
-                    rent_book()
+            # ask user are they sure they want to rent
+            x = int(input("Return: " + book_name + "? (Yes: 1. No: 0): "))
+            if(x == 0):
+                return_book()
+            elif(x == 1):       
+                # return rented book to books dictionary
+                books[isbn] = [books[isbn][0],books[isbn][1], books[isbn][2] + 1]
+
+                # deduct qty from rented book dictionary or remove it
+                if(qty > 1):
+                    books_rented[isbn][2] -= 1
                 else:
-                    clear()
-                    print(Color("{autored}Not a valid choice. Try again{/autored}"))
-                    input("Press Enter to continue...")
-                    rent_book()
-            else: #book not in stock let user rent something else
+                    books_rented.pop(isbn)
+                return_book()
+            else:
                 clear()
-                print(Color("{autored}" + book_name + " is not available.. Try again{/autored}"))
+                print(Color("{autored}Not a valid choice. Try again{/autored}"))
                 input("Press Enter to continue...")
-                rent_book()
+                return_book()
+        else:
+            clear()
+            print(Color("{autored}ISBN must be 13 digits long. Try again{/autored}"))
+            input("Press Enter to continue...")
+            return_book()
+            
+    except:
+        clear()
+        print(Color("{autored}Something went wrong. Try again{/autored}"))
+        input("Press Enter to continue...")
+        return_book()
+
+def update_info():
+    clear()
+    # we setup the library table and its header
+    library_table = [
+        ['ISBN-13', 'Title', 'Author', 'Qty'],
+    ]
+
+    # we loop through books and add each book to the ascii table
+    for isbn in books:
+        #find and colour code quantity
+        qty = "" # we set qty to zero then get the qty from dictionary
+        if int(books[isbn][2]) > 1: # we set the colour based on stock level
+            qty = Color("{autogreen}" + str(books[isbn][2]) + "{/autogreen}")
+        elif int(books[isbn][2]):
+            qty = Color("{autoyellow}" + str(books[isbn][2]) + "{/autoyellow}") # we want to warn the user that stock is low
+        else:
+            qty = Color("{autored}" + str(books[isbn][2]) + "{/autored}")
+
+        b_row = [isbn, books[isbn][0], books[isbn][1], qty] # we add a book per row
+        library_table.append(b_row) # we add a row to the table using append. which will add to end of dictionary
+        library = AsciiTable(library_table) # we add the library table in an ascii table format
+
+    library.title = Color("{autoblue} pyBook {/autoblue}") + " Library: Showing " + str(len(books)) + " Books"
+
+    print(library.table + " \n") # we print our ascii table library
+    print("""
+    Update a book:
+        - To update a book, enter the ISBN-13 number and hit enter.
+        *Press 0 return to library menu*
+    """)
+    try:#try catch to make sure not null or string
+        x = int(input("ISBN-13: "))
+        if(x == 0):
+            clear()
+            print(Color("{autoblue}Returning to Library Menu{/autoblue}"))
+            input("Press Enter to continue...")
+            show_books()
+        elif(len(str(x)) == 13):
+            # get book from book dictionary and check qty
+            isbn = x
+            book_name = books[isbn][0]
+            book_author = books[isbn][1] 
+            qty = books[isbn][2]
+            # ask user are they sure they want to rent
+            x = int(input("Update: " + book_name + "? (Yes: 1. No: 0): "))
+            if(x == 0):
+                update_info()
+            elif(x == 1):
+                old_isbn = isbn
+                x = 0
+                x = int(input("ISBN: " + isbn + ". New ISBN (Press enter to skip..): "))
+                if(x != 0): # check 13 digits long
+                    isbn = x
+                x = ""
+                x = str(input("Name: " + book_name + ". New Name (Press enter to skip..): "))
+                if(x != ""):
+                    book_name = x
+                x = ""
+                x = str(input("Author: " + book_author + ". New Author (Press enter to skip..): "))
+                if(x != ""):
+                    book_author = x
+                x = 0
+                x = int(input("Qty: " + isbn + ". New Qty (Press enter to skip..): "))
+                if(x != 0): #allow for minus
+                    qty = x
+                qty = books[isbn][2]
+                # return rented book to books dictionary
+                books[old_isbn] = [book_name,book_author, qty]
+                books[isbn] = books.pop(old_isbn)
+                update_info()
+            else:
+                clear()
+                print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                input("Press Enter to continue...")
+                update_info()
+            
         else:
             clear()
             print(Color("{autored}ISBN must be 13 digits long. Try again{/autored}"))
@@ -377,8 +461,6 @@ def return_book():
         print(Color("{autored}Something went wrong. Try again{/autored}"))
         input("Press Enter to continue...")
         rent_book()
-
-
 run = True #used to control main program, false will quit
 while run:
     run = main_menu()
