@@ -1,6 +1,6 @@
 """
-Copyright 2021, C08345457, All rights reserved.
-@author Robert O Sullivan <http://mailto:c08345457@mytudublin.ie> 
+Copyright 2021, Rob Sullivan, All rights reserved.
+@author Rob Sullivan <http://mailto:c08345457@mytudublin.ie> 
 
 What is it:
 This program is a simple implementation of a small library system using only dictionaries
