@@ -1,0 +1,74 @@
+#!/bin/bash
+
+#install server - https://phoenixnap.com/kb/how-to-install-apache-web-server-on-ubuntu-18-04
+ # sudo apt-get update
+ # sudo apt-get install apache2
+ # type this in browser: http://local.server.ip
+ # hostname -I | awk '{print $1}' to find
+ # sudo ufw show app list
+ # sudo ufw allow 'Apache'
+ # sudo ufw status
+
+ # apache server control
+ # sudo systemctl stop apache2.service
+ # sudo systemctl start apache2.service
+ # sudo systemctl restart apache2.service
+ # sudo systemctl reload apache2.service
+
+#setup function
+ #if not exist
+  #mkdir research
+  #mkdir published
+  #mkdir html
+  #mkdir logfiles
+  #mkdir backups
+  #access
+   #research shared
+   #all other private
+
+#people function
+ #add person
+ #view all people
+ #remove person
+
+#group function
+ #change group permissions
+
+#publish function
+ #mv /publish/ /website/
+
+#update function
+ #mv updated-files /publish/ /website
+
+#backup function
+ #DATE=$(date +"%d-%b-%Y")
+ #cd /var/www/
+ #tar -zcvf HTML-$DATE.tgz html
+ #mv *.tgz /media/HDD-01/html
+
+#lock file function
+ #https://www.putorius.net/lock-files-bash-scripts.html
+ #https://www.putorius.net/using-trap-to-exit-bash-scripts-cleanly.html
+ #https://www.putorius.net/linux-io-file-descriptors-and-redirection.html
+ #https://gavv.github.io/articles/file-locks/
+ #exec 100>/var/tmp/testlock.lock || exit 1
+ #flock -n 100 || exit 1
+ #trap 'rm -f /var/tmp/testlock.lock' EXIT
+
+#scheduled tasks
+ #https://opensource.com/article/17/11/how-use-cron-linux
+ #cron publish function 2am per day
+
+#monitor function
+ #what changed
+  #log change
+  #generate log file
+  #store on server /var/www
+
+#search function
+ #grep
+#main menu function
+ #1 users
+ #2 logs
+ #3 setup
+ #0 exit
