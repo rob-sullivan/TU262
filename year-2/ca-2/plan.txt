@@ -27,9 +27,9 @@
    #all other private
 
 #people function
- #add person
- #view all people
- #remove person
+ #add person - done
+ #view all people - done
+ #remove person - done
 
 #group function
  #change group permissions

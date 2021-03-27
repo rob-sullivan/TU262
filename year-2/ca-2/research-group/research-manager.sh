@@ -1,11 +1,49 @@
 #! /bin/bash
 
-function welcome() {
+#function to list all, add or delete users $1 is command, $2 is user's name
+function People(){ 
+    #list all users
+    if [ "$1" == "list" ]
+    then
+        printf "Current Users:\n"
+        for user in $( cd /home/ && ls )
+        do
+            echo " user: $user"
+        done
+    #add user
+    elif [ "$1" == "add" ]
+    then
+        
+        for user in $( cd /home/ && ls )
+        do
+            if [ "$user" == "$2"]
+            then
+                echo " user: $user exists"
+            else
+                sudo useradd -m $2
+                echo " user: $user created"
+            fi
+        done
+    #remove user
+    elif [ "$1" == "remove" ]
+    then
+        sudo userdel -r $2
+    else
+        printf " Only the following allowed:\n"
+        printf "  people list\n"
+        printf "  people add [name]\n"
+        printf "  people remove [name]\n"
+    fi
+}
+
+function Welcome() {
     clear
     printf "**Welcome to Research Manager**\n\n"    
 }
 
-function checkServer(){
+#used during startup check this function checks if apache is installed and running if it's not we give user 
+#some info on how to do it and if it is installed but not running we try run it.
+function CheckServer(){
     #checking if Apache is running or not
     if ! pidof apache2 > /dev/null
     then
@@ -17,6 +55,7 @@ function checkServer(){
         if pidof apache2 > /dev/null
         then
             printf " apache restarted successfully\n"
+            serverPath="/var/www/" #now we get a path to it, for later
         else
             printf " apache is not running. check if installed and try running\n"
             printf " sudo apt-get update\n"
@@ -25,11 +64,53 @@ function checkServer(){
         fi
     else
         printf " Apache is running.\n"
+        serverPath="/var/www/" #now we get a path to it, for later
     fi
 }
+
+function SetupDemoFolders(){
+    #the following will be our demo folders
+    #html - apache server generated folder
+    #research - where our pdf papers will be unpublished
+    #published - where our published papers will be copied to site
+    #logfiles - different log files for admins
+    #backups - backups of html website and papers
+
+    researchFolders=('html', 'research', 'published', 'logfiles', 'backups')
+    #first we setup our folders by doing a check and create if not found
+    numFolders=${#researchFolders[@]}
+
+    #this for loop checks all our folders 
+    #if we added more it would check those too
+    for (( i=0; i<numFolders; i++))
+    do
+        folderName=${researchFolders[$i]::-1} # need -1 to remove comma
+
+        #simple check if folder exists and create if not
+        if [ -d "$serverPath$folderName" ] 
+        then
+            printf " folder: $folderName ok\n"
+        else
+            sudo mkdir -p $serverPath$folderName
+            printf " folder: $folderName :created\n"
+        fi
+    done
+}
+
 #used during startup check to create a html file if one doesn't exist
-function setupHtmlFile() {
-    cat <<EOT >> index.html
+function SetupDemoHtmlFile() {
+    #now check for index.html and create if not
+    htmlFolder=${researchFolders[0]::-1}
+
+    if [ -f "$serverPath$htmlFolder/index.html" ]
+    then
+        echo " file: index.html ok"
+    else
+        #little complex but all we are doing here
+        #is creating the content of a html file
+        # we pass in the html path as an arg
+        htmlPath=$serverPath$htmlFolder
+        cat <<EOT >> index.html
 <!DOCTYPE html>
 <html>
     <head>
@@ -63,47 +144,41 @@ function setupHtmlFile() {
 		    <th>Author(s)</th>
 		</tr>
 		<tr>
-		    <td>Alfreds Futterkiste</td>
-		    <td>Maria Anders</td>
-		    <td>Germany</td>
+		    <td>2015</td>
+		    <td>ADAM : A Method For Stocastic Optimization</td>
+		    <td>Diederik P. Kingma & Jimmy Lei Ba</td>
 		</tr>
 		<tr>
-		    <td>Centro comercial Moctezuma</td>
-		    <td>Francisco Chang</td>
-		    <td>Mexico</td>
+		    <td>2016</td>
+		    <td>Asynchronous Methods for Deep Reinforcement Learning</td>
+		    <td>Volodymyr Mnih et Al</td>
 		</tr>
 		<tr>
-		    <td>Ernst Handel</td>
-		    <td>Roland Mendel</td>
-		    <td>Austria</td>
+		    <td>2016</td>
+		    <td>High Dimensional Continuous Control Using Generalized Advantage Estimation</td>
+		    <td>John Schulman et Al</td>
 		</tr>
 		<tr>
-		    <td>Island Trading</td>
-		    <td>Helen Bennett</td>
-		    <td>UK</td>
-		</tr>
-		<tr>
-		    <td>Laughing Bacchus Winecellars</td>
-		    <td>Yoshi Tannamuri</td>
-		    <td>Canada</td>
-		</tr>
-		<tr>
-		    <td>Magazzini Alimentari Riuniti</td>
-		    <td>Giovanni Rovelli</td>
-		    <td>Italy</td>
+		    <td>20019</td>
+		    <td>Markov Decision Processes</td>
+		    <td>Martijn van Otterlo</td>
 		</tr>
         </table>
     </body>
 </html>
 EOT
-sudo mv index.html $htmlPath/index.html
-printf " file: index.html created\n"
+        sudo mv index.html $htmlPath/index.html
+        printf " file: index.html created\n"
+    fi
+ 
 }
 
 #used during startup check to copy over demo papers
-function setupDemoPapers(){
+function SetupDemoPapers(){
+    #so far so good, now we copy over our demo papers to research folder
+    researchFolder=${researchFolders[1]::-1}
+    dest=$serverPath$researchFolder/
 
-    dest=$1
     cd demo-papers/
 
     for file in $( ls )
@@ -119,91 +194,38 @@ function setupDemoPapers(){
     
 }
 
-#do a check and see if system is setup correctly.
-function checkSetup()
-{
-    printf "running demo setup:\n"
+function SetupDemoUsers(){
+    #the following will be our demo users who will be researchers
+    #Sarah Conor # chief researcher
+    #Miles Dyson
+    #Jon Conor
+    researchers=('sarah', 'miles', 'jon')
+    numrusers=${#researchers[@]}
 
-    #first we check if apache is running. 
-    checkServer
-
-    #now we get a path to it, for later
-    serverPath="/var/www/"
-
-    #the following will be our demo folders
-    :-'
-        html - apache server generated folder
-        research - where our pdf papers will be unpublished
-        published - where our published papers will be copied to site
-        logfiles - different log files for admins
-        backups - backups of html website and papers
-    '
-    researchFolders=('html', 'research', 'published', 'logfiles', 'backups')
-
-    #the following will be our demo users
-    :-'
-        Sarah Conor # chief researcher
-        Miles Dyson
-        Jon Conor
-    '
-    researchers={'sarah', 'miles', 'jon'}
-
-    #first we setup our folders by doing a check and create if not found
-    numFolders=${#researchFolders[@]}
-    
-    #this for loop checks all our folders 
-    #if we added more it would check those too
-    for (( i=0; i<numFolders; i++))
+    for (( i=0; i<numrusers; i++))
     do
-        folderName=${researchFolders[$i]::-1} # need -1 to remove comma
-
-        #simple check if folder exists and create if not
-        if [ -d "$serverPath$folderName" ] 
-        then
-            printf " folder: $folderName ok\n"
-        else
-            sudo mkdir -p $serverPath$folderName
-            printf " folder: $folderName :created\n"
-        fi
+        r_user=${researchers[$i]::-1}
+        sudo useradd -m $r_user
     done
-    
-    #now check for index.html and create if not
-    htmlFolder=${researchFolders[0]::-1}
+}
 
-    if [ -f "$serverPath$htmlFolder/index.html" ]
-    then
-        echo " file: index.html ok"
-    else
-        #little more complex but all we are doing
-        #is creating a html file via a function
-        # we pass in the html path as an arg
-        htmlPath=$serverPath$htmlFolder
-        setupHtmlFile $htmlPath
-    fi
-
-    #so far so good, now we copy over our demo papers to research folder
-    researchFolder=${researchFolders[1]::-1}
-    setupDemoPapers $serverPath$researchFolder/
-
-
+function SetupDemoGroup(){
     #create group, create users and set access
     folderName=${researchFolders[1]::-1} #research set to shared
     sudo chmod -R 770 $serverPath$folderName # root, groups can rwx world cannot
-
     #group setup
     if [ $(getent group r_group) ]; then
         echo "group exists."
-        sudo addgroup r_group #we create our research group
         sudo chgrp -R r_group $serverPath$folderName
         sudo stfacl -dR -m g:r_group:rwx $serverPath$folderName
     else
         echo "group does not exist."
+        sudo addgroup r_group #we create our research group
         sudo chgrp -R r_group $serverPath$folderName
         sudo stfacl -dR -m g:r_group:rwx $serverPath$folderName
     fi
 
     #check if users exist and added to group
-    numrusers=${#researchers[@]}
     for (( i=0; i<numrusers; i++))
     do
         if id "$i" >/dev/null 2>&1; then
@@ -214,25 +236,84 @@ function checkSetup()
             echo "user: $i does not exist"
         fi
     done
-
+}
+#do a check and see if system is setup correctly.
+function Setup()
+{
+    printf "running demo setup:\n"
+    #CheckServer #first we check if apache is running. Then get path to server 
+    #SetupDemoFolders #then we setup our folders
+    #SetupDemoHtmlFile # we check and setup our demo website
+    #SetupDemoPapers # we copy over papers to our research folder
+    SetupDemoUsers
+    #SetupDemoGroup
     #set all other folders to private
-
-
-    printf "\demo setup complete.\n\n"
-
+    printf "demo setup complete.\n\n"
     printf "site live at: http://127.0.0.1/\n\n"
+    read -n 1 -s -r -p "Press any key to continue"
+    Menu
 }
 
+function UserMenu()
+{
+    Welcome #show title and clear screen
+    #select loop
+    select choice in List Add Delete Groups Back
+    do
+        #gives options automatically
+        #echo "You have selected $car"
+        case $choice in
+        List)
+            Welcome #show title and clear screen
+            People list
+            read -n 1 -s -r -p "Press any key to continue"
+            UserMenu;;
+        Add)
+            Welcome #show title and clear screen
+            printf "enter name of user to add\n"
+            read newUser
+            People "add" $newUser
+            read -n 1 -s -r -p "Press any key to continue"
+            UserMenu;;
+        Delete)
+            echo "Delete";;
+        Groups)
+            echo "Groups";;
+        Back)
+            Main;;
+        *)
+            echo "Please select a valid option."
+        esac
+    done
+}
+
+function MainMenu()
+{
+    Welcome #show title and clear screen
+    #select loop
+    select choice in Users Logs Setup Exit
+    do
+        #gives options automatically
+        #echo "You have selected $car"
+        case $choice in
+        Users)
+            UserMenu;;
+        Logs)
+            echo "Logs";;
+        Setup)
+            Setup;;
+        Exit)
+            echo "exiting..." && exit;;
+        *)
+            echo "Please select a valid option."
+        esac
+    done
+}
 #main function that runs and controls the program 
-function main() {
-    welcome
-    checkSetup
+function Main() {
+    Welcome
+    MainMenu
 }
 
-#main #starts the manager
-
-if [ $(getent group r_group) ]; then
-  echo "group exists."
-else
-  echo "group does not exist."
-fi
+Main #starts the manager
+#
