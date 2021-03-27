@@ -1,35 +1,5 @@
 #! /bin/bash
 
-#Assumptions:
-    #The research group only has one server, running Apache as the webserver. 
-    #All changes made to the site will be in /var/www/html and assumed to appear on the website instantly.
-    #Backups will be made to the backups folder on the server
-    #The research group already exists
-    #Users have an accounts on the server, they can login and make changes to the shared research directory(folder).
-    #All changes will be made under their user accounts. e.g su username
-    #Folder structure:
-        #research
-        #published
-        #html
-        #logfiles
-        #backups
-
-
-#to install server - https://phoenixnap.com/kb/how-to-install-apache-web-server-on-ubuntu-18-04
- # sudo apt-get update
- # sudo apt-get install apache2
- # type this in browser: http://local.server.ip
- # hostname -I | awk '{print $1}' to find
- # sudo ufw show app list
- # sudo ufw allow 'Apache'
- # sudo ufw status
-
- # apache server control
- # sudo systemctl stop apache2.service
- # sudo systemctl start apache2.service
- # sudo systemctl restart apache2.service
- # sudo systemctl reload apache2.service
-
 #/**** SCHEDULE FUNCTIONS ****/
 function scheduleStatus()
 {
@@ -38,9 +8,6 @@ function scheduleStatus()
     printf "**Welcome to Research Manager**\n\n" 
     printf "SCHEDULE STATUS\n\n"
     crontab -l
-    read -n 1 -s -r -p "Press any key to return to the Main Menu"
-    MainMenu
-
 }
 
 function nightlyPublish()
@@ -293,8 +260,6 @@ function listResearchers()
     do
         printf " User: $user, Groups:" && id $user
     done
-    read -n 1 -s -r -p "Press any key to return to the Main Menu"
-    MainMenu
 }
 
 #This is to create a new researcher
@@ -593,7 +558,72 @@ function unpublishAResearchPaper()
     ResearchMenu
 
 }
-schedule
+
+function systemHealth()
+{
+    clear
+    printf "**Welcome to Research Manager**\n\n" 
+    printf "System Health Check\n\n"
+
+    printf "\n\nserver check:\n"
+    #checking if Apache is running or not
+    if ! pidof apache2 > /dev/null
+    then
+        printf " apache web server is down, trying auto-restart. please wait...\n"
+        # web server down, restart the server
+        sudo /etc/init.d/apache2 restart > /dev/null
+        sleep 10
+        #checking if apache restarted or not
+        if pidof apache2 > /dev/null
+        then
+            printf " apache restarted successfully at: http://127.0.0.1/\n"
+            serverPath="/var/www/" #now we get a path to it, for later
+        else
+            printf " apache is not running. check if installed and try running\n"
+            printf " sudo apt-get update\n"
+            printf " sudo apt-get install apache2\n\n"
+            exit
+        fi
+    else
+        printf " Apache is running.\n"
+        serverPath="/var/www/html" #now we get a path to it, for later
+    fi
+    read -n 1 -s -r -p "Press any key to continue"
+    #folder health
+    clear
+    printf "**Welcome to Research Manager**\n\n" 
+    printf "System Health Check\n\n"
+    printf "folder health:\n"
+    researchFolders=('live', 'research', 'published', 'logfiles', 'backups',)
+    numFolders=${#researchFolders[@]}
+    for (( i=0; i<numFolders; i++))
+    do
+        folderName=${researchFolders[$i]::-1} # need -1 to remove comma
+        #simple check if folder exists and create if not
+        if [ -d "$serverPath/$folderName" ] 
+        then
+            printf " folder: $folderName ok\n"
+        else
+            printf " folder: $folderName :does not exist\n"
+        fi
+    done
+    read -n 1 -s -r -p "Press any key to continue"
+    scheduleStatus
+    read -n 1 -s -r -p "Press any key to continue"
+    viewAllLogs
+    read -n 1 -s -r -p "Press any key to continue"
+    listResearchers
+    read -n 1 -s -r -p "Press any key to continue"
+    publishStatus
+    read -n 1 -s -r -p "Press any key to continue"
+    clear
+    printf "**Welcome to Research Manager**\n\n" 
+    printf "System Health Check\n\n"
+    printf "hardware health:\n"
+    vmstat
+
+}
+
 #/**** MENU SYSTEMs ****/
 function ScheduleMenu()
 {
@@ -605,20 +635,20 @@ function ScheduleMenu()
     select choice in View-All-Logs View-Log Search-Log Generate-Logs Back
     do
         case $choice in
-        View-Schedule )
+        View-Schedule)
             scheduleStatus 
             read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
             ScheduleMenu;;
         Manual-Schedule-Publish)
-            nightlyPublish;;
+            nightlyPublish
             read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
             ScheduleMenu;;
         Manual-Schedule-Backup)
-            nightlyBackup;;
+            nightlyBackup
             read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
             ScheduleMenu;;
         Manual-Schedule-Log)
-            nightlyLog;;
+            nightlyLog
             read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
             ScheduleMenu;;
         Back)
@@ -655,7 +685,6 @@ function LogMenu()
         esac
     done
 }
-
 
 function ResearchMenu()
 {
@@ -700,7 +729,9 @@ function GroupMenu()
         #echo "You have selected $car"
         case $choice in
         List)
-            listResearchers;; #d.r.y here by reusing list researchers
+            listResearchers #d.r.y here by reusing list researchers
+            read -n 1 -s -r -p "Press any key to return to the Main Menu"
+            GroupMenu;;
         Add)
             addResearcherToGroup;;
         Remove)
@@ -726,7 +757,9 @@ function UserMenu()
         #echo "You have selected $car"
         case $choice in
         List)
-            listResearchers;;
+            listResearchers
+            read -n 1 -s -r -p "Press any key to return to the Main Menu"
+            UserMenu;;
         Add)
             createResearcher;;
         Delete)
@@ -760,11 +793,14 @@ function MainMenu()
         Logs)
             LogMenu;;
         Schedules)
-            scheduleStatus;;
+            ScheduleMenu;;
         Backup)
-            backupWebsite;; 
+            backupWebsite
+            read -n 1 -s -r -p "Press any key to return to the Menu Menu"
+            MainMenu;;
         Health)
-            echo "Schedules";; #system health menu.
+            systemHealth
+            MainMenu;;
         Setup)
             SetupResearchSystem;;
         Exit)
@@ -776,5 +812,4 @@ function MainMenu()
     done
 }
 
-#MainMenu #main function to start the program and show the menu
-scheduleStatus
+MainMenu #main function to start the program and show the menu
