@@ -386,16 +386,19 @@ function removeResearcherFromGroup(){
 function publishAllResearch()
 {
     for p_paper in $( ls /var/www/html/research/ )
-    do
-        if [ "$p_paper" != "index.html" ]
+    do  
+        #create a .lock file to lock the file
+        sudo touch $p_paper.lock
+        if [[ -f "/var/www/html/published/$p_paper" ]]
         then
-            if [[ -f "/var/www/html/published/$p_paper" ]]
-            then
-                sudo rm -v /var/www/html/research/$p_paper
-            else
-                sudo cp /var/www/html/research/$p_paper /var/www/published/
-                sudo rm -v /var/www/html/research/$p_paper
-            fi
+            sudo rm -v /var/www/html/research/$p_paper
+            #delete a .lock file to unlock the file
+            sudo rm $p_paper.lock
+        else
+            sudo cp /var/www/html/research/$p_paper /var/www/published/
+            sudo rm -v /var/www/html/research/$p_paper
+            #delete a .lock file to unlock the file
+            sudo rm $p_paper.lock
         fi
     done
     printf "\n"
@@ -405,15 +408,16 @@ function publishAllToSite()
 {
     for p_paper in $( ls /var/www/html/published/ )
     do
-        if [ "$p_paper" != "index.html" ]
+        #create a .lock file to lock the file
+        sudo touch $p_paper.lock
+        if [[ -f "/var/www/html/live/$p_paper" ]]
         then
-            if [[ -f "/var/www/html/live/$p_paper" ]]
-            then
-                sudo rm -v /var/www/html/published/$p_paper
-            else
-                sudo cp /var/www/html/published/$p_paper /var/www/html/live/
-                sudo rm -v /var/www/html/published/$p_paper
-            fi
+            sudo rm -v /var/www/html/published/$p_paper
+            sudo rm $p_paper.lock
+        else
+            sudo cp /var/www/html/published/$p_paper /var/www/html/live/
+            sudo rm -v /var/www/html/published/$p_paper
+            sudo rm $p_paper.lock
         fi
     done
     printf "\n"
@@ -423,15 +427,15 @@ function unpublishAllFromSite()
 {
     for p_paper in $( ls /var/www/html/live/ )
     do
-        if [ "$p_paper" != "index.html" ]
+        sudo touch $p_paper.lock
+        if [[ -f "/var/www/html/published/$p_paper" ]]
         then
-            if [[ -f "/var/www/html/published/$p_paper" ]]
-            then
-                sudo rm -v /var/www/html/published/$p_paper
-            else
-                sudo cp /var/www/html/live/$p_paper /var/www/html/published/
-                sudo rm -v /var/www/html/live/$p_paper
-            fi
+            sudo rm -v /var/www/html/published/$p_paper
+            sudo rm $p_paper.lock
+        else
+            sudo cp /var/www/html/live/$p_paper /var/www/html/published/
+            sudo rm -v /var/www/html/live/$p_paper
+            sudo rm $p_paper.lock
         fi
     done
     printf "\n"
@@ -442,15 +446,15 @@ function unpublishAllResearch()
 {
     for p_paper in $( ls /var/www/published/ )
     do
-        if [ "$p_paper" != "index.html" ]
+        sudo touch $p_paper.lock
+        if [[ -f "/var/www/research/$p_paper" ]]
         then
-            if [[ -f "/var/www/research/$p_paper" ]]
-            then
-                sudo rm -v /var/www/html/published/$p_paper
-            else
-                sudo cp /var/www/html/published/$p_paper /var/www/html/research/
-                sudo rm -v /var/www/html/published/$p_paper
-            fi
+            sudo rm -v /var/www/html/published/$p_paper
+            sudo rm $p_paper.lock
+        else
+            sudo cp /var/www/html/published/$p_paper /var/www/html/research/
+            sudo rm -v /var/www/html/published/$p_paper
+            sudo rm $p_paper.lock
         fi
     done
     printf "\n"
@@ -492,7 +496,8 @@ function publishAResearchPaper()
     publishStatus
     printf "Enter the full name the paper to publish\n"
     read p_paper
-    if [ "$p_paper" != "index.html" ]
+    lockedFile=${p_paper[$i]::-4}
+    if [ "$p_paper" != "$lockedFile.lock" ]
     then
         if [[ -f "/var/www/html/published/$p_paper" ]]
         then
@@ -501,6 +506,8 @@ function publishAResearchPaper()
             sudo cp /var/www/html/research/$p_paper /var/www/html/published/
             sudo rm -v /var/www/html/research/$p_paper
         fi
+    else
+        printf "$p_paper is currently locked.\n"
     fi
     printf "\n"
     publishStatus
@@ -513,7 +520,8 @@ function publishAPaperToSite()
     publishStatus
     printf "Enter the full name the paper to publish to the site\n"
     read p_paper
-    if [ "$p_paper" != "index.html" ]
+    lockedFile=${p_paper[$i]::-4}
+    if [ "$p_paper" != "$lockedFile.lock" ]
     then
         if [[ -f "/var/www/html/live/$p_paper" ]]
         then
@@ -522,6 +530,8 @@ function publishAPaperToSite()
             sudo cp /var/www/html/published/$p_paper /var/www/html/live/
             sudo rm -v /var/www/html/published/$p_paper
         fi
+    else
+        printf "$p_paper is currently locked.\n"
     fi
     printf "\n"
     publishStatus
@@ -534,7 +544,8 @@ function unpublishAPaperFromSite()
     publishStatus
     printf "Enter the full name the paper to unpublish from site\n"
     read p_paper
-    if [ "$p_paper" != "index.html" ]
+    lockedFile=${p_paper[$i]::-4}
+    if [ "$p_paper" != "$lockedFile.lock" ]
     then
         if [ "$p_paper" != "index.html" ]
         then
@@ -546,6 +557,8 @@ function unpublishAPaperFromSite()
                 sudo rm -v /var/www/html/live/$p_paper
             fi
         fi
+    else
+        printf "$p_paper is currently locked.\n"
     fi
     printf "\n"
     publishStatus
@@ -558,7 +571,8 @@ function unpublishAResearchPaper()
     publishStatus
     printf "Enter the full name the paper to unpublish\n"
     read p_paper
-    if [ "$p_paper" != "index.html" ]
+    lockedFile=${p_paper[$i]::-4}
+    if [ "$p_paper" != "$lockedFile.lock" ]
     then
         if [ "$p_paper" != "index.html" ]
         then
@@ -570,6 +584,8 @@ function unpublishAResearchPaper()
                 sudo rm -v /var/www/html/published/$p_paper
             fi
         fi
+    else
+        printf "$p_paper is currently locked.\n"
     fi
     printf "\n"
     publishStatus
@@ -584,21 +600,27 @@ function ScheduleMenu()
     #show title and clear screen
     clear
     printf "**Welcome to Research Manager**\n\n" 
-    printf "lOG MENU\n\n"
+    printf "SCHEDULE MENU\n\n"
     #select loop
     select choice in View-All-Logs View-Log Search-Log Generate-Logs Back
     do
         case $choice in
         View-Schedule )
-            viewAllLogs 
-            read -n 1 -s -r -p "Press any key to return to the Research Menu"
-            LogMenu;;
-        View-Log)
-            viewLog;;
-        Search-Log)
-            searchLog;;
-        Generate-Logs)
-            generateLogFiles;;
+            scheduleStatus 
+            read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
+            ScheduleMenu;;
+        Manual-Schedule-Publish)
+            nightlyPublish;;
+            read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
+            ScheduleMenu;;
+        Manual-Schedule-Backup)
+            nightlyBackup;;
+            read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
+            ScheduleMenu;;
+        Manual-Schedule-Log)
+            nightlyLog;;
+            read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
+            ScheduleMenu;;
         Back)
             MainMenu;;
         *)
@@ -618,7 +640,7 @@ function LogMenu()
         case $choice in
         View-All-Logs )
             viewAllLogs 
-            read -n 1 -s -r -p "Press any key to return to the Research Menu"
+            read -n 1 -s -r -p "Press any key to return to the Log Menu"
             LogMenu;;
         View-Log)
             viewLog;;
