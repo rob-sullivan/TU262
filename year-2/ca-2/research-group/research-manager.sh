@@ -31,7 +31,8 @@
  # sudo systemctl reload apache2.service
 
 #/**** SCHEDULE FUNCTIONS ****/
-function scheduleStatus(){
+function scheduleStatus()
+{
     #show title and clear screen
     clear
     printf "**Welcome to Research Manager**\n\n" 
@@ -42,20 +43,98 @@ function scheduleStatus(){
 
 }
 
-function nightlyPublish(){
-    #write out current crontab
+function nightlyPublish()
+{
+    printf "scheduling nightly 2am publish\n"
+    #check job not already in place 
+    #write out current crontab and echo new cron into cron file
+    crontab -l | grep -q 'publishAllToSite'  && echo 'nightly schedule exists already' || echo "00 02 * * * root ./research-manager.sh && publishAllToSite" >> tempCron
     crontab -l > tempCron
-    #echo new cron into cron file
-    echo "00 02 * * * root ./research-manager.sh && publishAllToSite" >> tempCron
+    
+    
     #install new cron file
     crontab tempCron
     rm tempCron
 }
 
-function backup(){
+function nightlyBackup()
+{
+    printf "scheduling nightly backup\n"
+    #check job not already in place 
+    #write out current crontab and echo new cron into cron file
+    crontab -l | grep -q 'backupWebsite'  && echo 'nightly schedule exists already' || echo "00 02 * * * root ./research-manager.sh && backupWebsite" >> tempCron
+    crontab -l > tempCron
+    #install new cron file
+    crontab tempCron
+    rm tempCron
+}
+
+function nightlyLog()
+{
+    printf "scheduling nightly logfiles\n"
+    #write out current crontab
+    crontab -l > tempCron
+    #echo new cron into cron file
+    echo "01 02 * * * root ./research-manager.sh && generateLogFiles" >> tempCron
+    #install new cron file
+    crontab tempCron
+    rm tempCron
+}
+
+#/**** BACKUP FUNCTIONS ****/
+function backupWebsite()
+{
+    printf "making a backup of files\n"
     DATE=$(date +"%d-%b-%Y")
     sudo tar -zcvf website-$DATE.tgz /var/www/html
-    sudo mv *.tgz /var/www/backups/
+    sudo mv *.tgz /var/www/html/backups/
+}
+
+#/**** LOGGING FUNCTIONS ****/
+function viewAllLogs()
+{
+    clear
+    printf "**Welcome to Research Manager**\n\n" 
+    printf "Log Files:\n"
+    for log in $( ls /var/www/html/logfiles/ )
+    do
+        printf " $log\n"
+    done
+    printf "\n"
+}
+
+function viewLog()
+{
+    viewAllLogs
+    printf "Enter a log file to view\n"
+    read logfile
+    sudo cat /var/www/html/logfiles/$logfile
+    read -n 1 -s -r -p "Press any key to return to the Log Menu"
+    LogMenu
+}
+
+function searchLog()
+{
+    viewAllLogs
+    printf "Enter a log file to search in\n"
+    read logfile
+    printf "Enter a search term\n"
+    read searchTerm
+    grep $searchTerm /var/www/html/logfiles/$logfile.txt
+    read -n 1 -s -r -p "Press any key to return to the Log Menu"
+    LogMenu
+}
+
+function generateLogFiles()
+{
+    printf "generating logfiles\n"
+    numFolders=${#researchFolders[@]}
+    for (( i=0; i<numFolders; i++))
+    do
+        folderName=${researchFolders[$i]::-1} # need -1 to remove comma
+        sudo ausearch -f $serverPath/$folderName | aureport -f -i  > $serverPath/logfiles/$folderName.txt
+    done
+
 }
 
 function SetupResearchSystem(){
@@ -100,7 +179,7 @@ function SetupResearchSystem(){
             fi
         else
             printf " Apache is running.\n"
-            serverPath="/var/www" #now we get a path to it, for later
+            serverPath="/var/www/html" #now we get a path to it, for later
         fi
 
         #SETUP GROUP
@@ -114,6 +193,10 @@ function SetupResearchSystem(){
             sudo addgroup r_group #we create our research group
         fi
 
+        #SETUP AUDITD
+        #checks if auditd is installed (taken from here: https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script#:~:text=To%20check%20if%20something%20is,then%20run%20this%20tool%20again.%22&text=The%20executable%20check%20is%20needed,name%20is%20found%20in%20%24PATH%20.) 
+        command -v auditd >/dev/null 2>&1 || { echo >&2 "auditd not installed.\nrun sudo apt install auditd."; }
+
         #SETUP FOLDERS
         printf "\n\nfolder setup:\n"
         #the following will be our research folders
@@ -122,7 +205,7 @@ function SetupResearchSystem(){
         #published - where our published papers will be copied to site
         #logfiles - different log files for admins
         #backups - backups of html website and papers
-        researchFolders=('html', 'research', 'published', 'logfiles', 'backups',)
+        researchFolders=('live', 'research', 'published', 'logfiles', 'backups',)
         #first we setup our folders by doing a check and create if not found
         numFolders=${#researchFolders[@]}
         for (( i=0; i<numFolders; i++))
@@ -134,12 +217,16 @@ function SetupResearchSystem(){
                 sudo chown root:r_group $serverPath/$folderName
                 #here we set all folders to be private
                 sudo chmod -R 744 $serverPath/$folderName # rootcan rwx, groups can r--, world cannot
+                #put a watch on dir -w is watch -p is options w r x a(append)
+                sudo auditctl -w $serverPath/$folderName -p wrxa
                 printf " folder: $folderName ok\n"
             else
                 sudo mkdir -p $serverPath/$folderName
                 sudo chown root:r_group $serverPath/$folderName
                 #here we set all folders to be private
                 sudo chmod -R 744 $serverPath/$folderName # root can rwx, groups can r--, world cannot
+                #put a watch on dir -w is watch -p is options w r x a(append)
+                sudo auditctl -w $serverPath/$folderName -p wrxa
                 printf " folder: $folderName :created\n"
             fi
         done
@@ -156,11 +243,10 @@ function SetupResearchSystem(){
         #Jon Conor
         #su in as one of these users. eg su sarah
 
-        #first lets make us and admin(root) a researcher if not done already
+        #first lets make admin(root) part of research group if not done already
         sudo usermod -aG r_group root
-        sudo usermod -aG r_group $USERNAME
-        printf "root and $USERNAME:\n"
-        printf " root and $USERNAME may need to re-login for group settings to take effect\n\n"
+        printf "root:\n"
+        printf " root may need to re-login for group settings to take effect\n\n"
         #now we define 3 other researchers in an array
         researchers=('sarah', 'miles', 'jon',)
         numrusers=${#researchers[@]} #get the length of the array for our loop
@@ -180,7 +266,11 @@ function SetupResearchSystem(){
         #SETUP SCHEDULES
         printf "\n\nschedule setup:\n"
         nightlyPublish #copies all publish files to html folder at 2am every night
+        nightlyBackup #packages up files in html folder and stores them in var/www/backup/ each night
+        nightlyLog #we use aureport with ausearch to generate log files
 
+        #SETUP LOGFIES
+        generateLogFiles #we generate initial logfiles in /var/www/html/logfiles/
 
         printf "finished setup commands...\n\n"
     else
@@ -295,16 +385,16 @@ function removeResearcherFromGroup(){
 
 function publishAllResearch()
 {
-    for p_paper in $( ls /var/www/research/ )
+    for p_paper in $( ls /var/www/html/research/ )
     do
         if [ "$p_paper" != "index.html" ]
         then
-            if [[ -f "/var/www/published/$p_paper" ]]
+            if [[ -f "/var/www/html/published/$p_paper" ]]
             then
-                sudo rm -v /var/www/research/$p_paper
+                sudo rm -v /var/www/html/research/$p_paper
             else
-                sudo cp /var/www/research/$p_paper /var/www/published/
-                sudo rm -v /var/www/research/$p_paper
+                sudo cp /var/www/html/research/$p_paper /var/www/published/
+                sudo rm -v /var/www/html/research/$p_paper
             fi
         fi
     done
@@ -313,16 +403,16 @@ function publishAllResearch()
 
 function publishAllToSite()
 {
-    for p_paper in $( ls /var/www/published/ )
+    for p_paper in $( ls /var/www/html/published/ )
     do
         if [ "$p_paper" != "index.html" ]
         then
-            if [[ -f "/var/www/html/$p_paper" ]]
+            if [[ -f "/var/www/html/live/$p_paper" ]]
             then
-                sudo rm -v /var/www/published/$p_paper
+                sudo rm -v /var/www/html/published/$p_paper
             else
-                sudo cp /var/www/published/$p_paper /var/www/html/
-                sudo rm -v /var/www/published/$p_paper
+                sudo cp /var/www/html/published/$p_paper /var/www/html/live/
+                sudo rm -v /var/www/html/published/$p_paper
             fi
         fi
     done
@@ -331,16 +421,16 @@ function publishAllToSite()
 
 function unpublishAllFromSite()
 {
-    for p_paper in $( ls /var/www/html/ )
+    for p_paper in $( ls /var/www/html/live/ )
     do
         if [ "$p_paper" != "index.html" ]
         then
-            if [[ -f "/var/www/published/$p_paper" ]]
+            if [[ -f "/var/www/html/published/$p_paper" ]]
             then
-                sudo rm -v /var/www/html/$p_paper
+                sudo rm -v /var/www/html/published/$p_paper
             else
-                sudo cp /var/www/html/$p_paper /var/www/published/
-                sudo rm -v /var/www/html/$p_paper
+                sudo cp /var/www/html/live/$p_paper /var/www/html/published/
+                sudo rm -v /var/www/html/live/$p_paper
             fi
         fi
     done
@@ -356,10 +446,10 @@ function unpublishAllResearch()
         then
             if [[ -f "/var/www/research/$p_paper" ]]
             then
-                sudo rm -v /var/www/published/$p_paper
+                sudo rm -v /var/www/html/published/$p_paper
             else
-                sudo cp /var/www/published/$p_paper /var/www/research/
-                sudo rm -v /var/www/published/$p_paper
+                sudo cp /var/www/html/published/$p_paper /var/www/html/research/
+                sudo rm -v /var/www/html/published/$p_paper
             fi
         fi
     done
@@ -376,19 +466,19 @@ function publishStatus()
     printf "Research Paper Status..\n\n"
 
     printf "\nUnpublished Research Papers:\n"
-    for r_paper in $( ls /var/www/research/ )
+    for r_paper in $( ls /var/www/html/research/ )
     do
         printf " Paper: $r_paper\n"
     done
     printf "\n"
     printf "Published Research Papers:\n"
-    for p_paper in $( ls /var/www/published/ )
+    for p_paper in $( ls /var/www/html/published/ )
     do
         printf " Paper: $p_paper\n"
     done
     printf "\n"
     printf "Live on Website:\n"
-    for p_paper in $( ls /var/www/html/ )
+    for p_paper in $( ls /var/www/html/live/ )
     do
         if [ "$p_paper" != "index.html" ]
         then
@@ -404,12 +494,12 @@ function publishAResearchPaper()
     read p_paper
     if [ "$p_paper" != "index.html" ]
     then
-        if [[ -f "/var/www/published/$p_paper" ]]
+        if [[ -f "/var/www/html/published/$p_paper" ]]
         then
-            sudo rm -v /var/www/research/$p_paper
+            sudo rm -v /var/www/html/research/$p_paper
         else
-            sudo cp /var/www/research/$p_paper /var/www/published/
-            sudo rm -v /var/www/research/$p_paper
+            sudo cp /var/www/html/research/$p_paper /var/www/html/published/
+            sudo rm -v /var/www/html/research/$p_paper
         fi
     fi
     printf "\n"
@@ -425,12 +515,12 @@ function publishAPaperToSite()
     read p_paper
     if [ "$p_paper" != "index.html" ]
     then
-        if [[ -f "/var/www/html/$p_paper" ]]
+        if [[ -f "/var/www/html/live/$p_paper" ]]
         then
-            sudo rm -v /var/www/published/$p_paper
+            sudo rm -v /var/www/html/published/$p_paper
         else
-            sudo cp /var/www/published/$p_paper /var/www/html/
-            sudo rm -v /var/www/published/$p_paper
+            sudo cp /var/www/html/published/$p_paper /var/www/html/live/
+            sudo rm -v /var/www/html/published/$p_paper
         fi
     fi
     printf "\n"
@@ -448,12 +538,12 @@ function unpublishAPaperFromSite()
     then
         if [ "$p_paper" != "index.html" ]
         then
-            if [[ -f "/var/www/published/$p_paper" ]]
+            if [[ -f "/var/www/html/published/$p_paper" ]]
             then
-                sudo rm -v /var/www/html/$p_paper
+                sudo rm -v /var/www/html/live/$p_paper
             else
-                sudo cp /var/www/html/$p_paper /var/www/published/
-                sudo rm -v /var/www/html/$p_paper
+                sudo cp /var/www/html/live/$p_paper /var/www/html/published/
+                sudo rm -v /var/www/html/live/$p_paper
             fi
         fi
     fi
@@ -472,12 +562,12 @@ function unpublishAResearchPaper()
     then
         if [ "$p_paper" != "index.html" ]
         then
-            if [[ -f "/var/www/research/$p_paper" ]]
+            if [[ -f "/var/www/html/research/$p_paper" ]]
             then
-                sudo rm -v /var/www/published/$p_paper
+                sudo rm -v /var/www/html/published/$p_paper
             else
-                sudo cp /var/www/published/$p_paper /var/www/research/
-                sudo rm -v /var/www/published/$p_paper
+                sudo cp /var/www/html/published/$p_paper /var/www/html/research/
+                sudo rm -v /var/www/html/published/$p_paper
             fi
         fi
     fi
@@ -487,8 +577,64 @@ function unpublishAResearchPaper()
     ResearchMenu
 
 }
-
+schedule
 #/**** MENU SYSTEMs ****/
+function ScheduleMenu()
+{
+    #show title and clear screen
+    clear
+    printf "**Welcome to Research Manager**\n\n" 
+    printf "lOG MENU\n\n"
+    #select loop
+    select choice in View-All-Logs View-Log Search-Log Generate-Logs Back
+    do
+        case $choice in
+        View-Schedule )
+            viewAllLogs 
+            read -n 1 -s -r -p "Press any key to return to the Research Menu"
+            LogMenu;;
+        View-Log)
+            viewLog;;
+        Search-Log)
+            searchLog;;
+        Generate-Logs)
+            generateLogFiles;;
+        Back)
+            MainMenu;;
+        *)
+            echo "Please select a valid option."
+        esac
+    done
+}
+function LogMenu()
+{
+    #show title and clear screen
+    clear
+    printf "**Welcome to Research Manager**\n\n" 
+    printf "lOG MENU\n\n"
+    #select loop
+    select choice in View-All-Logs View-Log Search-Log Generate-Logs Back
+    do
+        case $choice in
+        View-All-Logs )
+            viewAllLogs 
+            read -n 1 -s -r -p "Press any key to return to the Research Menu"
+            LogMenu;;
+        View-Log)
+            viewLog;;
+        Search-Log)
+            searchLog;;
+        Generate-Logs)
+            generateLogFiles;;
+        Back)
+            MainMenu;;
+        *)
+            echo "Please select a valid option."
+        esac
+    done
+}
+
+
 function ResearchMenu()
 {
     #show title and clear screen
@@ -590,11 +736,11 @@ function MainMenu()
         Research)
             ResearchMenu;;
         Logs)
-            echo "Logs";;
+            LogMenu;;
         Schedules)
             scheduleStatus;;
         Backup)
-            backup;; 
+            backupWebsite;; 
         Health)
             echo "Schedules";; #system health menu.
         Setup)
@@ -608,4 +754,5 @@ function MainMenu()
     done
 }
 
-MainMenu
+#MainMenu #main function to start the program and show the menu
+scheduleStatus
