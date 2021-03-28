@@ -505,6 +505,18 @@ function publishStatus()
     done
     printf "\n"
 }
+
+function searchPapers()
+{
+    publishStatus
+    printf "Enter a search term\n"
+    read searchTerm
+    grep $searchTerm /var/www/html/logfiles/$logfile.txt
+    grep -r $searchTerm /var/www/html/live/ /var/www/html/published/ /var/www/html/research/
+    read -n 1 -s -r -p "Press any key to return to the Research Menu"
+    LogMenu
+}
+
 function publishAResearchPaper()
 {
     publishStatus
@@ -809,7 +821,7 @@ function ResearchMenu()
     printf "**Welcome to Research Manager**\n\n" 
     printf "RESEARCH MENU\n\n"
     #select loop
-    select choice in Publish-Status Publish-A-Research-Paper Publish-A-Paper-To-Site Unpublish-A-Research-Paper Unpublish-A-Paper-From-Site Back
+    select choice in Publish-Status Search-Papers Publish-A-Research-Paper Publish-A-Paper-To-Site Unpublish-A-Research-Paper Unpublish-A-Paper-From-Site Back
     do
         case $choice in
         Publish-Status)
@@ -817,6 +829,10 @@ function ResearchMenu()
             publishStatus
             read -n 1 -s -r -p "Press any key to return to the Research Menu"
             ResearchMenu;;
+        Search-Papers)
+            clear
+            searchPapers
+            read -n 1 -s -r -p "Press any key to return to the Research Menu"
         Publish-A-Research-Paper)
             clear
             publishAResearchPaper;;
@@ -955,5 +971,4 @@ function MainMenu()
     done
 }
 
-#MainMenu #main function to start the program and show the menu
-systemHealthReport
+MainMenu #main function to start the program and show the menu
