@@ -1,10 +1,44 @@
 #! /bin/bash
 
+#Copyright 2021, Rob Sullivan, All rights reserved.
+#@author Rob Sullivan <http://mailto:c08345457@mytudublin.ie> 
+
+#What is it:
+#This script helps an administrator of a research group conducting ongoing research to track changes 
+#made to their directories, preventing where possible incorrect changes to the directory. 
+#An administrator can use this script to determine who made changes. 
+#Overall offering transparency and accountability for all changes made to the research directory going forward.
+
+#How it works:
+#Using the menu system an admin can setup directories, manage scheduled tasks, manage user/group management and view logs
+
+#This script was wrote in bash and tested on Ubuntu
+
+#Installation & Running
+# - sudo apt install apache2
+# - sudo apt install auditd
+# - sudo ./research-manager.sh
+
+
+#License
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#A copy of the GNU General Public License can be found at 
+#<http://www.gnu.org/licenses/>.
+
+
+
+
 #/**** SCHEDULE FUNCTIONS ****/
 function scheduleStatus()
 {
     #show title and clear screen
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "SCHEDULE STATUS\n\n"
     crontab -l
@@ -48,19 +82,32 @@ function nightlyLog()
     rm tempCron
 }
 
+function nightlyHealthCheck()
+{
+    printf "scheduling nightly health check\n"
+    #write out current crontab
+    crontab -l > tempCron
+    #echo new cron into cron file
+    echo "01 02 * * * root ./research-manager.sh && systemHealthReport" >> tempCron
+    #install new cron file
+    crontab tempCron
+    rm tempCron
+}
+
 #/**** BACKUP FUNCTIONS ****/
 function backupWebsite()
 {
     printf "making a backup of files\n"
+    sudo chmod -R 700 /var/www/html/
     DATE=$(date +"%d-%b-%Y")
     sudo tar --exclude='/var/www/html/backups/' -zcvf website-$DATE.tgz /var/www/html
     sudo mv *.tgz /var/www/html/backups/
+    sudo chmod -R 777 /var/www/html/
 }
 
 #/**** LOGGING FUNCTIONS ****/
 function viewAllLogs()
 {
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "Log Files:\n"
     for log in $( ls /var/www/html/logfiles/ )
@@ -108,7 +155,6 @@ function generateLogFiles()
 function SetupResearchSystem(){
 
     #show title and clear screen
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "SETUP Research System\n\n"
     printf "This command will run a setup of the research system.\n"
@@ -253,7 +299,6 @@ function SetupResearchSystem(){
 function listResearchers()
 {
     #show title and clear screen
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "List Researchers\n\n"
     printf "Current Researcher:\n"
@@ -267,7 +312,6 @@ function listResearchers()
 function createResearcher()
 {
     #show title and clear screen
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "Create New Researcher\n\n"
     printf "Enter the name of new researcher to add\n"
@@ -281,7 +325,6 @@ function createResearcher()
 function deleteResearcher()
 {
     #show title and clear screen
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "Delete Researcher\n\n"
 
@@ -302,7 +345,6 @@ function deleteResearcher()
 #/**** GROUP ADMIN FUNCTIONS ****/
 function addResearcherToGroup(){
     #show title and clear screen
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "Add Researcher to Group\n\n"
 
@@ -322,7 +364,6 @@ function addResearcherToGroup(){
 
 function removeResearcherFromGroup(){
     #show title and clear screen
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "Remove Researcher to Group\n\n"
 
@@ -351,6 +392,7 @@ function removeResearcherFromGroup(){
 
 function publishAllResearch()
 {
+    sudo chmod -R 700 /var/www/html/
     for p_paper in $( ls /var/www/html/research/ )
     do  
         #create a .lock file to lock the file
@@ -367,11 +409,13 @@ function publishAllResearch()
             sudo rm $p_paper.lock
         fi
     done
+    sudo chmod -R 777 /var/www/html/
     printf "\n"
 }
 
 function publishAllToSite()
 {
+    sudo chmod -R 700 /var/www/html/
     for p_paper in $( ls /var/www/html/published/ )
     do
         #create a .lock file to lock the file
@@ -386,11 +430,13 @@ function publishAllToSite()
             sudo rm $p_paper.lock
         fi
     done
+    sudo chmod -R 777 /var/www/html/
     printf "\n"
 }
 
 function unpublishAllFromSite()
 {
+    sudo chmod -R 700 /var/www/html/
     for p_paper in $( ls /var/www/html/live/ )
     do
         sudo touch $p_paper.lock
@@ -404,12 +450,14 @@ function unpublishAllFromSite()
             sudo rm $p_paper.lock
         fi
     done
+    sudo chmod -R 777 /var/www/html/
     printf "\n"
 
 }
 
 function unpublishAllResearch()
 {
+    sudo chmod -R 700 /var/www/html/
     for p_paper in $( ls /var/www/published/ )
     do
         sudo touch $p_paper.lock
@@ -423,6 +471,7 @@ function unpublishAllResearch()
             sudo rm $p_paper.lock
         fi
     done
+    sudo chmod -R 777 /var/www/html/
     printf "\n"
 
 }
@@ -431,7 +480,6 @@ function unpublishAllResearch()
 function publishStatus()
 {
     #show title and clear screen
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "Research Paper Status..\n\n"
 
@@ -564,10 +612,9 @@ function unpublishAResearchPaper()
 
 function systemHealth()
 {
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "System Health Check\n\n"
-
+    printf "Please note a report has also been generated and stored in /var/www/html/logfiles/\n\n"
     printf "\n\nserver check:\n"
     #checking if Apache is running or not
     if ! pidof apache2 > /dev/null
@@ -593,7 +640,6 @@ function systemHealth()
     fi
     read -n 1 -s -r -p "Press any key to continue"
     #folder health
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "System Health Check\n\n"
     printf "folder health:\n"
@@ -619,11 +665,67 @@ function systemHealth()
     read -n 1 -s -r -p "Press any key to continue"
     publishStatus
     read -n 1 -s -r -p "Press any key to continue"
-    clear
     printf "**Welcome to Research Manager**\n\n" 
     printf "System Health Check\n\n"
     printf "hardware health:\n"
     vmstat
+
+}
+function systemHealthReport()
+{
+    printf "generating system health report\n"
+    printf "report can be found in /var/www/html/logfiles/\n"
+    printf "errors/issues: \n"
+    DATE=$(date +"%d-%b-%Y")
+    printf $DATE >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    printf "System Health CheReport\n\n" >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+
+    printf "\n\nserver check:\n"  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    #checking if Apache is running or not
+    if ! pidof apache2 > /dev/null
+    then
+        printf " apache web server is down, trying auto-restart. please wait...\n"  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+        # web server down, restart the server
+        sudo /etc/init.d/apache2 restart > /dev/null
+        sleep 10
+        #checking if apache restarted or not
+        if pidof apache2 > /dev/null
+        then
+            printf " apache restarted successfully at: http://127.0.0.1/\n" >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+            serverPath="/var/www/" #now we get a path to it, for later
+        else
+            printf " apache is not running. check if installed and try running\n" >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+            printf " sudo apt-get update\n" >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+            printf " sudo apt-get install apache2\n\n" >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+            exit
+        fi
+    else
+        printf " Apache is running.\n" >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+        serverPath="/var/www/html" #now we get a path to it, for later
+    fi
+    #folder health
+    printf "**Welcome to Research Manager**\n\n"  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    printf "System Health Check\n\n"  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    printf "folder health:\n"  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    researchFolders=('live', 'research', 'published', 'logfiles', 'backups',)
+    numFolders=${#researchFolders[@]}
+    for (( i=0; i<numFolders; i++))
+    do
+        folderName=${researchFolders[$i]::-1} # need -1 to remove comma
+        #simple check if folder exists and create if not
+        if [ -d "$serverPath/$folderName" ] 
+        then
+            printf " folder: $folderName ok\n"  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+        else
+            printf " folder: $folderName :does not exist\n"  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+        fi
+    done
+    scheduleStatus  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    viewAllLogs  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    listResearchers  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    publishStatus  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    printf "hardware health:\n"  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
+    vmstat  >> /var/www/html/logfiles/systemhealthreport-$DATE.txt
 
 }
 
@@ -639,24 +741,30 @@ function ScheduleMenu()
     do
         case $choice in
         View-Schedule)
+            clear
             scheduleStatus 
             read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
             ScheduleMenu;;
         Manual-Schedule-Publish)
+            clear
             nightlyPublish
             read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
             ScheduleMenu;;
         Manual-Schedule-Backup)
+            clear
             nightlyBackup
             read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
             ScheduleMenu;;
         Manual-Schedule-Log)
+            clear
             nightlyLog
             read -n 1 -s -r -p "Press any key to return to the Schedule Menu"
             ScheduleMenu;;
         Back)
+            clear
             MainMenu;;
         *)
+            clear
             echo "Please select a valid option."
         esac
     done
@@ -672,18 +780,23 @@ function LogMenu()
     do
         case $choice in
         View-All-Logs )
+            clear
             viewAllLogs 
             read -n 1 -s -r -p "Press any key to return to the Log Menu"
             LogMenu;;
         View-Log)
+            clear
             viewLog;;
         Search-Log)
+            clear
             searchLog;;
         Generate-Logs)
+            clear
             generateLogFiles;;
         Back)
             MainMenu;;
         *)
+            clear
             echo "Please select a valid option."
         esac
     done
@@ -700,20 +813,27 @@ function ResearchMenu()
     do
         case $choice in
         Publish-Status)
+            clear
             publishStatus
             read -n 1 -s -r -p "Press any key to return to the Research Menu"
             ResearchMenu;;
         Publish-A-Research-Paper)
+            clear
             publishAResearchPaper;;
         Publish-A-Paper-To-Site)
+            clear
             publishAPaperToSite;;
         Unpublish-A-Research-Paper)
+            clear
             unpublishAResearchPaper;;
         Unpublish-A-Paper-From-Site)
+            clear
             unpublishAPaperFromSite;;
         Back)
+            clear
             MainMenu;;
         *)
+            clear
             echo "Please select a valid option."
         esac
     done
@@ -732,16 +852,21 @@ function GroupMenu()
         #echo "You have selected $car"
         case $choice in
         List)
+            clear
             listResearchers #d.r.y here by reusing list researchers
             read -n 1 -s -r -p "Press any key to return to the Main Menu"
             GroupMenu;;
         Add)
+            clear
             addResearcherToGroup;;
         Remove)
+            clear
             removeResearcherFromGroup;;
         Back)
+            clear
             UserMenu;;
         *)
+            clear
             echo "Please select a valid option."
         esac
     done
@@ -760,18 +885,24 @@ function UserMenu()
         #echo "You have selected $car"
         case $choice in
         List)
+            clear
             listResearchers
             read -n 1 -s -r -p "Press any key to return to the Main Menu"
             UserMenu;;
         Add)
+            clear
             createResearcher;;
         Delete)
+            clear
             deleteResearcher;;
         Groups)
+            clear
             GroupMenu;;
         Back)
+            clear
             MainMenu;;
         *)
+            clear
             echo "Please select a valid option."
         esac
     done
@@ -790,29 +921,39 @@ function MainMenu()
         #echo "You have selected $car"
         case $choice in
         Users)
+            clear
             UserMenu;;
         Research)
+            clear
             ResearchMenu;;
         Logs)
+            clear
             LogMenu;;
         Schedules)
+            clear
             ScheduleMenu;;
         Backup)
+            clear
             backupWebsite
             read -n 1 -s -r -p "Press any key to return to the Menu Menu"
             MainMenu;;
         Health)
+            clear
             systemHealth
+            systemHealthReport
             MainMenu;;
         Setup)
+            clear
             SetupResearchSystem;;
         Exit)
             clear
             echo "exited Research Manager..." && exit;;
         *)
+            clear
             echo "Please select a valid option."
         esac
     done
 }
 
-MainMenu #main function to start the program and show the menu
+#MainMenu #main function to start the program and show the menu
+systemHealthReport
