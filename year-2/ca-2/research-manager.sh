@@ -53,7 +53,7 @@ function backupWebsite()
 {
     printf "making a backup of files\n"
     DATE=$(date +"%d-%b-%Y")
-    sudo tar -zcvf website-$DATE.tgz /var/www/html
+    sudo tar --exclude='/var/www/html/backups/' -zcvf website-$DATE.tgz /var/www/html
     sudo mv *.tgz /var/www/html/backups/
 }
 
@@ -104,6 +104,7 @@ function generateLogFiles()
 
 }
 
+#/**** SETUP FUNCTION ****/
 function SetupResearchSystem(){
 
     #show title and clear screen
@@ -236,7 +237,7 @@ function SetupResearchSystem(){
         nightlyBackup #packages up files in html folder and stores them in var/www/backup/ each night
         nightlyLog #we use aureport with ausearch to generate log files
 
-        #SETUP LOGFIES
+        #SETUP LOGFILES
         generateLogFiles #we generate initial logfiles in /var/www/html/logfiles/
 
         printf "finished setup commands...\n\n"
@@ -559,6 +560,8 @@ function unpublishAResearchPaper()
 
 }
 
+#/**** SYSTEM HEALTH FUNCTIONS ****/
+
 function systemHealth()
 {
     clear
@@ -624,7 +627,7 @@ function systemHealth()
 
 }
 
-#/**** MENU SYSTEMs ****/
+#/**** MENU FUNCTIONS ****/
 function ScheduleMenu()
 {
     #show title and clear screen
