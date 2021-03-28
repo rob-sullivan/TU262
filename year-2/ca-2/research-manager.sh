@@ -102,7 +102,10 @@ function backupWebsite()
     DATE=$(date +"%d-%b-%Y")
     sudo tar --exclude='/var/www/html/backups/' -zcvf website-$DATE.tgz /var/www/html
     sudo mv *.tgz /var/www/html/backups/
-    sudo chmod -R 777 /var/www/html/
+    sudo chmod -R 774 /var/www/html/
+    #here we set the research folder to be a shared folder
+    sudo chmod -R 777 var/www/html/research/
+    sudo chmod -R 777 var/www/html/ #not to be used in production
 }
 
 #/**** LOGGING FUNCTIONS ****/
@@ -134,7 +137,7 @@ function searchLog()
     read logfile
     printf "Enter a search term\n"
     read searchTerm
-    grep $searchTerm /var/www/html/logfiles/$logfile.txt
+    grep $searchTerm /var/www/html/logfiles/$logfile
     read -n 1 -s -r -p "Press any key to return to the Log Menu"
     LogMenu
 }
@@ -230,7 +233,7 @@ function SetupResearchSystem(){
             then
                 sudo chown root:r_group $serverPath/$folderName
                 #here we set all folders to be private
-                sudo chmod -R 744 $serverPath/$folderName # rootcan rwx, groups can r--, world cannot
+                sudo chmod -R 764 $serverPath/$folderName # rootcan rwx, groups can r--, world cannot
                 #put a watch on dir -w is watch -p is options w r x a(append)
                 sudo auditctl -w $serverPath/$folderName -p wrxa
                 printf " folder: $folderName ok\n"
@@ -238,7 +241,7 @@ function SetupResearchSystem(){
                 sudo mkdir -p $serverPath/$folderName
                 sudo chown root:r_group $serverPath/$folderName
                 #here we set all folders to be private
-                sudo chmod -R 744 $serverPath/$folderName # root can rwx, groups can r--, world cannot
+                sudo chmod -R 764 $serverPath/$folderName # root can rwx, groups can r--, world cannot
                 #put a watch on dir -w is watch -p is options w r x a(append)
                 sudo auditctl -w $serverPath/$folderName -p wrxa
                 printf " folder: $folderName :created\n"
@@ -246,9 +249,8 @@ function SetupResearchSystem(){
         done
 
         #here we set the research folder to be a shared folder
-        folderName=${researchFolders[1]::-1}
-        sudo chmod -R 777 $serverPath/$folderName # root, groups, world can rwx
-
+        sudo chmod -R 777 var/www/html/research/ # root, groups, world can rwx
+        sudo chmod -R 777 var/www/html/ #not to be used in production
         #SETUP RESEARCHERS
         printf "\n\nresearcher setup:\n"
         #the following will be our researchers (including us)
@@ -409,7 +411,10 @@ function publishAllResearch()
             sudo rm $p_paper.lock
         fi
     done
-    sudo chmod -R 777 /var/www/html/
+    sudo chmod -R 774 /var/www/html/
+    #here we set the research folder to be a shared folder
+    sudo chmod -R 777 var/www/html/research # root, groups, world can rwx
+    sudo chmod -R 777 var/www/html/ #not to be used in production
     printf "\n"
 }
 
@@ -430,7 +435,10 @@ function publishAllToSite()
             sudo rm $p_paper.lock
         fi
     done
-    sudo chmod -R 777 /var/www/html/
+    sudo chmod -R 774 /var/www/html/
+    #here we set the research folder to be a shared folder
+    sudo chmod -R 777 var/www/html/research # root, groups, world can rwx
+    sudo chmod -R 777 var/www/html/ #not to be used in production
     printf "\n"
 }
 
@@ -450,7 +458,10 @@ function unpublishAllFromSite()
             sudo rm $p_paper.lock
         fi
     done
-    sudo chmod -R 777 /var/www/html/
+    sudo chmod -R 774 /var/www/html/
+    #here we set the research folder to be a shared folder
+    sudo chmod -R 777 var/www/html/research # root, groups, world can rwx
+    sudo chmod -R 777 var/www/html/ #not to be used in production
     printf "\n"
 
 }
@@ -471,7 +482,10 @@ function unpublishAllResearch()
             sudo rm $p_paper.lock
         fi
     done
-    sudo chmod -R 777 /var/www/html/
+    sudo chmod -R 774 /var/www/html/
+    #here we set the research folder to be a shared folder
+    sudo chmod -R 777 var/www/html/research # root, groups, world can rwx
+    sudo chmod -R 777 var/www/html/ #not to be used in production
     printf "\n"
 
 }
@@ -511,7 +525,7 @@ function searchPapers()
     publishStatus
     printf "Enter a search term\n"
     read searchTerm
-    grep $searchTerm /var/www/html/logfiles/$logfile.txt
+    grep $searchTerm /var/www/html/logfiles/$logfile
     grep -r $searchTerm /var/www/html/live/ /var/www/html/published/ /var/www/html/research/
     read -n 1 -s -r -p "Press any key to return to the Research Menu"
     LogMenu
@@ -677,10 +691,9 @@ function systemHealth()
     read -n 1 -s -r -p "Press any key to continue"
     publishStatus
     read -n 1 -s -r -p "Press any key to continue"
-    printf "**Welcome to Research Manager**\n\n" 
-    printf "System Health Check\n\n"
     printf "hardware health:\n"
     vmstat
+    read -n 1 -s -r -p "Press any key to continue"
 
 }
 function systemHealthReport()
