@@ -833,6 +833,7 @@ function ResearchMenu()
             clear
             searchPapers
             read -n 1 -s -r -p "Press any key to return to the Research Menu"
+            ResearchMenu;;
         Publish-A-Research-Paper)
             clear
             publishAResearchPaper;;
