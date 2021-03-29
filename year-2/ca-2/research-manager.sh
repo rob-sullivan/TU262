@@ -41,7 +41,7 @@ function scheduleStatus()
     #show title and clear screen
     printf "**Welcome to Research Manager**\n\n" 
     printf "SCHEDULE STATUS\n\n"
-    crontab -l
+    sudo crontab -l
 }
 
 function nightlyPublish()
@@ -49,13 +49,13 @@ function nightlyPublish()
     printf "scheduling nightly 2am publish\n"
     #check job not already in place 
     #write out current crontab and echo new cron into cron file
-    crontab -l | grep -q 'publishAllToSite'  && echo 'nightly schedule exists already' || echo "00 02 * * * root ./research-manager.sh && publishAllToSite" >> tempCron
-    crontab -l > tempCron
+    sudo crontab -l | grep -q 'publishAllToSite'  && echo 'nightly schedule exists already' || echo "00 02 * * * root ./research-manager.sh && publishAllToSite" >> tempCron1
+    sudo crontab -l >> tempCron1
     
     
     #install new cron file
-    crontab tempCron
-    rm tempCron
+    sudo crontab tempCron1
+    sudo rm tempCron1
 }
 
 function nightlyBackup()
@@ -63,35 +63,34 @@ function nightlyBackup()
     printf "scheduling nightly backup\n"
     #check job not already in place 
     #write out current crontab and echo new cron into cron file
-    crontab -l | grep -q 'backupWebsite'  && echo 'nightly schedule exists already' || echo "00 02 * * * root ./research-manager.sh && backupWebsite" >> tempCron
-    crontab -l > tempCron
+    sudo crontab -l | grep -q 'backupWebsite'  && echo 'nightly schedule exists already' || echo "01 02 * * * root ./research-manager.sh && backupWebsite" >> tempCron2
+    sudo crontab -l >> tempCron2
     #install new cron file
-    crontab tempCron
-    rm tempCron
+    sudo crontab tempCron2
+    sudo rm tempCron2
 }
 
 function nightlyLog()
 {
     printf "scheduling nightly logfiles\n"
-    #write out current crontab
-    crontab -l > tempCron
-    #echo new cron into cron file
-    echo "01 02 * * * root ./research-manager.sh && generateLogFiles" >> tempCron
+    #write out current crontab and echo new cron into cron file
+    sudo crontab -l | grep -q 'generateLogFiles'  && echo 'nightly schedule exists already' || echo "02 02 * * * root ./research-manager.sh && generateLogFiles" >> tempCron3
+    sudo crontab -l >> tempCron3
     #install new cron file
-    crontab tempCron
-    rm tempCron
+    sudo crontab tempCron3
+    sudo rm tempCron3
 }
 
 function nightlyHealthCheck()
 {
     printf "scheduling nightly health check\n"
     #write out current crontab
-    crontab -l > tempCron
-    #echo new cron into cron file
-    echo "01 02 * * * root ./research-manager.sh && systemHealthReport" >> tempCron
+    #write out current crontab and echo new cron into cron file
+    sudo crontab -l | grep -q 'systemHealthReport'  && echo 'nightly schedule exists already' || echo "03 02 * * * root ./research-manager.sh && systemHealthReport" >> tempCron4
+    sudo crontab -l >> tempCron4
     #install new cron file
-    crontab tempCron
-    rm tempCron
+    sudo crontab tempCron4
+    sudo rm tempCron4
 }
 
 #/**** BACKUP FUNCTIONS ****/
@@ -284,6 +283,7 @@ function SetupResearchSystem(){
         nightlyPublish #copies all publish files to html folder at 2am every night
         nightlyBackup #packages up files in html folder and stores them in var/www/backup/ each night
         nightlyLog #we use aureport with ausearch to generate log files
+        nightlyHealthCheck #generates a health report and stores it for us to check later
 
         #SETUP LOGFILES
         generateLogFiles #we generate initial logfiles in /var/www/html/logfiles/
@@ -525,10 +525,9 @@ function searchPapers()
     publishStatus
     printf "Enter a search term\n"
     read searchTerm
-    grep $searchTerm /var/www/html/logfiles/$logfile
     grep -r $searchTerm /var/www/html/live/ /var/www/html/published/ /var/www/html/research/
     read -n 1 -s -r -p "Press any key to return to the Research Menu"
-    LogMenu
+    ResearchMenu
 }
 
 function publishAResearchPaper()
@@ -762,7 +761,7 @@ function ScheduleMenu()
     printf "**Welcome to Research Manager**\n\n" 
     printf "SCHEDULE MENU\n\n"
     #select loop
-    select choice in View-All-Logs View-Log Search-Log Generate-Logs Back
+    select choice in View-Schedule Manual-Schedule-Publish Manual-Schedule-Backup Manual-Schedule-Log Back
     do
         case $choice in
         View-Schedule)
