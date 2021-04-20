@@ -1,4 +1,45 @@
 """
+Copyright 2021, Rob Sullivan, All rights reserved.
+@author Rob Sullivan <http://mailto:c08345457@mytudublin.ie> 
+
+What is it:
+This program is a simple implementation of a small library system using only dictionaries
+to describe and keep track of books. No objects or classes were used.
+
+How it works:
+Each book has a unique ISBN (13 digit number), a title and an author.  
+The library also keeps track of how many copies of the book are currently available to loan. 
+Books can be borrowed and returned.
+
+This program was made in Python3 3.8.8. python3 --version = 3.8.8
+
+Installation & Running
+ - pip3 install terminaltables # https://robpol86.github.io/terminaltables/install.html
+ - pip3 install colorclass # https://pypi.org/project/colorclass/
+ - python3 ./library.py
+
+
+License
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+A copy of the GNU General Public License can be found at 
+<http://www.gnu.org/licenses/>.
+
+
+TODO(rob): Allow user to give feedback
+
+BUG(rob): When user hits enter during x = int(Input("prompt")) it gives a base 10 error 
+    - used x = "" check to try solve.
+    - update_info() function most frequent
+
+"""
+"""
 You are asked to develop a small college management system to illustrate your understanding of the main object-oriented concepts.
 Your system should keep track of Students. 
 Each student has a student ID, name, email address and list of current modules they are taking. 
@@ -15,6 +56,10 @@ Some of the functionality your system should provide is:
 
 Make sure you include any relevant error checking and handle unexpected input.
 """
+# We install both terminaltables and colorClass to create a simple gui for the user in the terminal
+from terminaltables import AsciiTable # we are using the ascii table layout.
+from colorclass import Color, Windows # we are using color and windows to color the qty level in the terminal
+from os import system, name # used for clearing terminal function
 
 class Student():
     def __init__(self, id, name, email, max):
@@ -129,40 +174,125 @@ class Course(Student, Module):
     def unenrollStudent(self, module):
         self.modules_taken.pop(module.id)
 
-class MainMenu(Course):
+class MainMenuController(Course):
     def __init__(self):
         self.course = Course("TU060", "Advanced Software Development", \
             "MSc in Computer Science Advanced Software Development.")
-        self.demoModules()
+        self.demoModules() #load our demo content of modules and students
 
     def demoModules(self):
-        self.course.addModule("Programming Paradigms: Principles & Practice", 5)
-        self.course.addModule("Software Design", 5)
-        self.course.addModule("Advanced Databases", 5)
-        self.course.addModule("Systems Architectures", 5)
-        self.course.addModule("Web Application Architectures", 5)
-        self.course.addModule("Secure Systems Development", 5)
-        self.course.addModule("Critical Skills Core Modules", 5)
-        self.course.addModule("Research Writing & Scientific Literature", 5)
-        self.course.addModule("Research Methods and Proposal Writing", 5)
-        self.course.addModule("Research Project & Dissertation", 5)
-        self.course.addModule("Option Modules", 5)
-        self.course.addModule("Geographic Information Systems", 5)
-        self.course.addModule("Universal Design", 5)
-        self.course.addModule("Programming for Big Data", 5)
-        self.course.addModule("Problem Solving, Communication and Innovation", 5)
-        self.course.addModule("Social Network Analysis", 5)
-        self.course.addModule("User Experience Design", 5)
-        self.course.addModule("Security", 5)
-        self.course.addModule("Deep Learning", 5)
-        self.course.addModule("Speech & Audio Processing", 5)
-        self.course.addStudent("jon", "jon@terminator.com")
-        for mod_id, mod in self.course.modules.items():
-            print(str(mod_id) + ", " + mod.name)
-        print(self.course.students[0].name)
-        print(self.course.code)
-        print(self.course.name)
-        print(self.course.description)
+        demoModules = [
+            "Programming Paradigms: Principles & Practice",
+            "Software Design",
+            "Advanced Databases",
+            "Systems Architectures",
+            "Web Application Architectures",
+            "Secure Systems Development",
+            "Critical Skills Core Modules",
+            "Research Writing & Scientific Literature",
+            "Research Methods and Proposal Writing",
+            "Research Project & Dissertation",
+            "Option Modules",
+            "Geographic Information Systems",
+            "Universal Design",
+            "Programming for Big Data",
+            "Problem Solving, Communication and Innovation",
+            "Social Network Analysis",
+            "User Experience Design",
+            "Security",
+            "Deep Learning",
+            "Speech & Audio Processing",
+        ]
+        demoStudents = [
+            "jon,jon@terminator.com",
+            "sarah, sarah@terminator.com",
+            "conor, conor@terminator.com",
+            "buzz, buzz@toystory.com",
+            "woodie, woodie@toystory.com",
+            "elsa, elsa@frozen.com"
+        ]
+        for module in demoModules:
+            self.course.addModule(module, 5)
+
+        for student in demoStudents:
+            s = student.split(",")
+            self.course.addStudent(s[0], s[1])
+
+    def mainMenu(self):
+        clear()
+        # main title
+        print("**Welcome to" + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        print("""
+        Main Menu:
+
+            1. Student
+            2. Admin
+
+            *Press 0 to exit*
+        """)
+        try:
+            x = input("Main Menu: Choose an option: ")
+
+            #used to fix base 10 error, 
+            # just hitting enter will close the program
+            if(x == ""):
+                x = 0
+            else:
+                x = int(x)
+
+            if(x == 0):
+                clear()
+                print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
+                input("Press Enter to continue...")
+                return False #set run to false and quit program
+            elif(x == 1):
+                self.studentMenu()
+            elif(x == 2):
+                self.adminMenu()
+            else:
+                clear()
+                print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                input("Press Enter to continue...")
+                self.mainMenu()
+        except:
+            clear()
+            print(Color("{autored}Not a choice. Try again{/autored}"))
+            input("Press Enter to continue...")
+            self.mainMenu()
+
+    def studentMenu(self):
+        #what is your student id
+        #what do you want to do
+            #see your details
+            #update your details
+            #see your module
+            #enroll in a module
+            #drop a module
+        print("studentMenu")
+    
+    def adminMenu(self):
+        #what is your student id
+        #what do you want to do
+            #see your details
+            #update your details
+            #see your module
+            #enroll in a module
+            #drop a module
+        print("adminMenu")
+    """
+    This function was taken from https://www.geeksforgeeks.org/clear-screen-python/ to
+    allow the terminal to be cleared when changing menus or showing the user important
+    messages. It checks what operating system is being used and uses the correct 
+    clearing command.
+    """
+    def clear(self): 
+        # for windows 
+        if name == 'nt': 
+            _ = system('cls') 
+    
+        # for mac and linux(here, os.name is 'posix') 
+        else: 
+            _ = system('clear') 
 
 if __name__ == "__main__":
     MainMenu()
