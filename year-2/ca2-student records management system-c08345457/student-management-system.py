@@ -174,11 +174,12 @@ class Course(Student, Module):
     def unenrollStudent(self, module):
         self.modules_taken.pop(module.id)
 
-class MainMenuController(Course):
+class College(Course):
     def __init__(self):
         self.course = Course("TU060", "Advanced Software Development", \
             "MSc in Computer Science Advanced Software Development.")
         self.demoModules() #load our demo content of modules and students
+        self.mainMenu() # start the main menu
 
     def demoModules(self):
         demoModules = [
@@ -217,68 +218,6 @@ class MainMenuController(Course):
         for student in demoStudents:
             s = student.split(",")
             self.course.addStudent(s[0], s[1])
-
-    def mainMenu(self):
-        clear()
-        # main title
-        print("**Welcome to" + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
-        print("""
-        Main Menu:
-
-            1. Student
-            2. Admin
-
-            *Press 0 to exit*
-        """)
-        try:
-            x = input("Main Menu: Choose an option: ")
-
-            #used to fix base 10 error, 
-            # just hitting enter will close the program
-            if(x == ""):
-                x = 0
-            else:
-                x = int(x)
-
-            if(x == 0):
-                clear()
-                print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
-                input("Press Enter to continue...")
-                return False #set run to false and quit program
-            elif(x == 1):
-                self.studentMenu()
-            elif(x == 2):
-                self.adminMenu()
-            else:
-                clear()
-                print(Color("{autored}Not a valid choice. Try again{/autored}"))
-                input("Press Enter to continue...")
-                self.mainMenu()
-        except:
-            clear()
-            print(Color("{autored}Not a choice. Try again{/autored}"))
-            input("Press Enter to continue...")
-            self.mainMenu()
-
-    def studentMenu(self):
-        #what is your student id
-        #what do you want to do
-            #see your details
-            #update your details
-            #see your module
-            #enroll in a module
-            #drop a module
-        print("studentMenu")
-    
-    def adminMenu(self):
-        #what is your student id
-        #what do you want to do
-            #see your details
-            #update your details
-            #see your module
-            #enroll in a module
-            #drop a module
-        print("adminMenu")
     """
     This function was taken from https://www.geeksforgeeks.org/clear-screen-python/ to
     allow the terminal to be cleared when changing menus or showing the user important
@@ -294,6 +233,147 @@ class MainMenuController(Course):
         else: 
             _ = system('clear') 
 
+    def mainMenu(self):
+        self.clear()
+        # main title
+        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        print("""
+        Main Menu:
+
+            1. Students
+            2. Modules
+
+            *Press 0 to exit*
+        """)
+        try:
+            x = input("Main Menu: Choose an option: ")
+
+            #used to fix base 10 error, 
+            # just hitting enter will close the program
+            if(x == ""):
+                x = 0
+            else:
+                x = int(x)
+
+            if(x == 0):
+                self.clear()
+                print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
+                input("Press Enter to continue...")
+                return False #set run to false and quit program
+            elif(x == 1):
+                self.studentsMenu()
+            elif(x == 2):
+                self.modulesMenu()
+            else:
+                self.clear()
+                print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                input("Press Enter to continue...")
+                self.mainMenu()
+        except:
+            self.clear()
+            print(Color("{autored}Not a choice. Try again{/autored}"))
+            input("Press Enter to continue...")
+            self.mainMenu()
+
+    def studentsMenu(self):
+        self.clear()
+        # main title
+        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        print("""
+        Students Menu:
+
+            1. Current Students
+            2. Update Student Details
+            3. Add Student
+            4. Delete Student
+            5. Enrol Student
+            6. Unenrol Student
+
+            *Press 0 to go quit*
+        """)
+        try:
+            x = input("Students Menu: Choose an option: ")
+
+            #used to fix base 10 error, 
+            # just hitting enter will close the program
+            if(x == ""):
+                x = 0
+            else:
+                x = int(x)
+
+            if(x == 0):
+                self.clear()
+                print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
+                input("Press Enter to continue...")
+                return False #set run to false and quit program
+            elif(x == 1):
+                self.studentMenu()
+            elif(x == 2):
+                self.modulesMenu()
+            else:
+                self.clear()
+                print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                input("Press Enter to continue...")
+                self.mainMenu()
+        except:
+            self.clear()
+            print(Color("{autored}Not a choice. Try again{/autored}"))
+            input("Press Enter to continue...")
+            self.mainMenu()
+        #what is your student id
+        #what do you want to do
+            #see your details
+            #update your details
+            #see your module
+            #enroll in a module
+            #drop a module
+
+    def modulesMenu(self):
+        self.clear()
+        # main title
+        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        print("""
+        Students Menu:
+
+            1. All Modules
+            2. Update Module Details
+            3. Create Module
+            4. Delete Student
+            5. Enrol Students
+            6. Unenrol Students
+
+            *Press 0 to go quit*
+        """)
+        try:
+            x = input("Students Menu: Choose an option: ")
+
+            #used to fix base 10 error, 
+            # just hitting enter will close the program
+            if(x == ""):
+                x = 0
+            else:
+                x = int(x)
+
+            if(x == 0):
+                self.clear()
+                print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
+                input("Press Enter to continue...")
+                return False #set run to false and quit program
+            elif(x == 1):
+                self.studentMenu()
+            elif(x == 2):
+                self.modulesMenu()
+            else:
+                self.clear()
+                print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                input("Press Enter to continue...")
+                self.mainMenu()
+        except:
+            self.clear()
+            print(Color("{autored}Not a choice. Try again{/autored}"))
+            input("Press Enter to continue...")
+            self.mainMenu()
+
 if __name__ == "__main__":
-    MainMenu()
+    College()
 
