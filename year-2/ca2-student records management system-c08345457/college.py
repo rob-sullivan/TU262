@@ -3,13 +3,27 @@ Copyright 2021, Rob Sullivan, All rights reserved.
 @author Rob Sullivan <http://mailto:c08345457@mytudublin.ie> 
 
 What is it:
-This program is a simple implementation of a small library system using only dictionaries
-to describe and keep track of books. No objects or classes were used.
+This program is a simple implementation of a small college management system to 
+illustrate main object-oriented concepts
 
 How it works:
-Each book has a unique ISBN (13 digit number), a title and an author.  
-The library also keeps track of how many copies of the book are currently available to loan. 
-Books can be borrowed and returned.
+The system is made up of a student and module entity. A course controller manages data taken from the user
+in the menu boundary object.
+
+The system keeps track of Students. 
+Each student has a student ID, name, email address and list of current modules they are taking. 
+Each student can enrol in up to 5 modules max.
+Each Module has an unique code, a name, a number of ECTS credits. 
+Each module also has a max capacity, and once that is reached no more students can be enrolled until somebody unenrolls first.
+The system keeps track of, and update, what modules are students enrolled in.
+An admin can do the following:
+    • Print and update details about the students
+    • Print and update details about the modules
+    • Search for a student using different parameters (e.g. by email or student ID)
+    • Enrol and unenrol a student from a module
+    • Create and delete students and modules
+
+relevant error checking is implemented along with unexpected input handling.
 
 This program was made in Python3 3.8.8. python3 --version = 3.8.8
 
@@ -32,29 +46,11 @@ A copy of the GNU General Public License can be found at
 <http://www.gnu.org/licenses/>.
 
 
-TODO(rob): Allow user to give feedback
-
-BUG(rob): When user hits enter during x = int(Input("prompt")) it gives a base 10 error 
-    - used x = "" check to try solve.
-    - update_info() function most frequent
+TODO(rob): form validation on student menu
+TODO(rob): modules menu
 
 """
 """
-You are asked to develop a small college management system to illustrate your understanding of the main object-oriented concepts.
-Your system should keep track of Students. 
-Each student has a student ID, name, email address and list of current modules they are taking. 
-Each student can enrol in up to 5 modules max.
-Each Module has an unique code, a name, a number of ECTS credits. 
-Each module also has a max capacity, and once that is reached no more students can be enrolled until somebody unenrolls first.
-You’ll need to keep track of, and update, what modules are students enrolled in.
-Some of the functionality your system should provide is:
-    • Print and update details about the students
-    • Print and update details about the modules
-    • Search for a student using different parameters (e.g. by email or student ID)
-    • Enrol and unenroll a student from a module
-    • Create and delete students and modules
-
-Make sure you include any relevant error checking and handle unexpected input.
 """
 # We install both terminaltables and colorClass to create a simple gui for the user in the terminal
 from terminaltables import AsciiTable # we are using the ascii table layout.
@@ -76,7 +72,8 @@ class Student():
         
     
     def __str__(self):
-        return "id: " + str(self.id) + ", name: " + self.name + ", email: " +  self.email + ", module limit reached: " + ("Yes" if len(self.modules_taken) == self.max_cap else "No")
+        result = str(self.id) + self.name +  self.email
+        return result
 
 class Module():
     
@@ -111,7 +108,6 @@ class Course(Student, Module):
         # max set here at parent level
         self.max_modules_taken = 5
         self.max_module_students = 20
-
     #student management
     #view Student
     def viewAllStudents(self):
@@ -153,69 +149,71 @@ class Course(Student, Module):
     def deleteStudent(self, id):
         self.students.pop(id)
     #search Student
-    def searchStudent(self, id):
-        if id in self.students:
-            print(self.students[id])
-        # we setup the library table and its header
+    def searchStudent(self, q):
+        found = False
+        for s in self.students.values():        
+            if q in s.__str__():
+                student = s
+                found = True
+                break
+            #show list of found items and let the user pick one. Then set id to that.
+        if(found):
+            # we setup the student table and its header
+            student_table = [
+                ['Id', 'Name', 'Email', 'Modules'],
+            ]
 
-        student_table = [
-            ['Id', 'Name', 'Email', 'Modules'],
-        ]
-
-        # we loop through books and add each book to the ascii table
-        #print(self.students)
-
-        student = self.students[id]
-
-        qty = int(len(student.modules_taken))
-        #find and colour code qty of modules taken by students
-        modules_qty = "" # we set qty to zero then get the qty from dictionary
-        if qty == self.max_modules_taken: # we set the colour to red to inform the admin that the max level was reached
-            modules_qty = Color("{autored}" + str(qty) + "{/autored}")
-        elif qty > (self.max_modules_taken / 2):
-            modules_qty = Color("{autoyellow}" + str(qty) + "{/autoyellow}") # we want to warn the admin that module level is about to max
-        else:
-            modules_qty = Color("{autogreen}" + str(qty) + "{/autogreen}") # if module qty level is less than half of max colour it green
-
-        s_row = [id, student.name, student.email, modules_qty] # we add a student per row
-        student_table.append(s_row) # we add a row to the table using append. which will add to end of dictionary
-        student_list = AsciiTable(student_table) # we add the library table in an ascii table format
-            
-        student_list.title = Color(" {autoblue}"+ student.name + "{/autoblue}'s") + " details"
-        print("\n" + student_list.table) # we print our ascii table library
-
-        # we setup the library table and its header
-        module_table = [
-            ['Id', 'Name', 'ECTs', 'Students'],
-        ]
-        # we loop through books and add each book to the ascii table
-        #print(self.students)
-
-        for module_id in student.modules_taken.keys():
-            module = student.modules_taken[module_id]
-
-            qty = int(len(module.students_in_module))
+            qty = int(len(student.modules_taken))
             #find and colour code qty of modules taken by students
-            student_qty = "" # we set qty to zero then get the qty from dictionary
-            if qty == self.max_module_students: # we set the colour to red to inform the admin that the max level was reached
-                student_qty = Color("{autored}" + str(qty) + "{/autored}")
+            modules_qty = "" # we set qty to zero then get the qty from dictionary
+            if qty == self.max_modules_taken: # we set the colour to red to inform the admin that the max level was reached
+                modules_qty = Color("{autored}" + str(qty) + "{/autored}")
             elif qty > (self.max_modules_taken / 2):
-                student_qty = Color("{autoyellow}" + str(qty) + "{/autoyellow}") # we want to warn the admin that module level is about to max
+                modules_qty = Color("{autoyellow}" + str(qty) + "{/autoyellow}") # we want to warn the admin that module level is about to max
             else:
-                student_qty = Color("{autogreen}" + str(qty) + "{/autogreen}") # if module qty level is less than half of max colour it green
+                modules_qty = Color("{autogreen}" + str(qty) + "{/autogreen}") # if module qty level is less than half of max colour it green
 
-            m_row = [module_id, module.name, module.num_ects, student_qty] # we add a student per row
-            module_table.append(m_row) # we add a row to the table using append. which will add to end of dictionary
-        module_list = AsciiTable(module_table) # we add the library table in an ascii table format
-            
-        module_list.title = Color(" {autoblue}"+ student.name + "{/autoblue} is taking ") + str(len(student.modules_taken)) + " modules"
-        print("\n" + module_list.table) # we print our ascii table library
-    
+            s_row = [student.id, student.name, student.email, modules_qty] # we add a student per row
+            student_table.append(s_row) # we add a row to the table using append. which will add to end of dictionary
+            student_list = AsciiTable(student_table) # we add the library table in an ascii table format
+                
+            student_list.title = Color(" {autoblue}"+ student.name + "{/autoblue}'s") + " details"
+            print("\n" + student_list.table) # we print our ascii table library
+
+            # we setup the library table and its header
+            module_table = [
+                ['Row', 'Name', 'ECTs', 'Students'],
+            ]
+            # we loop through books and add each book to the ascii table
+            #print(self.students)
+
+            for module_id in student.modules_taken.keys():
+                module = student.modules_taken[module_id]
+
+                qty = int(len(module.students_in_module))
+                #find and colour code qty of modules taken by students
+                student_qty = "" # we set qty to zero then get the qty from dictionary
+                if qty == self.max_module_students: # we set the colour to red to inform the admin that the max level was reached
+                    student_qty = Color("{autored}" + str(qty) + "{/autored}")
+                elif qty > (self.max_modules_taken / 2):
+                    student_qty = Color("{autoyellow}" + str(qty) + "{/autoyellow}") # we want to warn the admin that module level is about to max
+                else:
+                    student_qty = Color("{autogreen}" + str(qty) + "{/autogreen}") # if module qty level is less than half of max colour it green
+
+                m_row = [module_id, module.name, module.num_ects, student_qty] # we add a student per row
+                module_table.append(m_row) # we add a row to the table using append. which will add to end of dictionary
+            module_list = AsciiTable(module_table) # we add the library table in an ascii table format
+                
+            module_list.title = Color(" {autoblue}"+ student.name + "{/autoblue} is taking ") + str(len(student.modules_taken)) + " modules"
+            print("\n" + module_list.table) # we print our ascii table library
+            return student.id
+        else:
+            print("Search: no result found..")
+            return -1
     #update Student
     def updateStudent(id, name, email):
         self.students[id].name
         self.students[id].email
-
     ##module management##
     def viewAllModule(self):
         # we setup the library table and its header
@@ -244,7 +242,6 @@ class Course(Student, Module):
             
         module_list.title = Color(" {autoblue}Module{/autoblue}") + " list: Showing " + str(len(self.modules)) + " modules"
         print("\n" + module_list.table) # we print our ascii table library
-
     #add module
     def addModule(self, name, num_ects):
         id = len(self.modules)
@@ -262,15 +259,14 @@ class Course(Student, Module):
         student = self.students[stu_id]
         module = self.modules[mod_id]
         
-        new_id = len(student.modules_taken)
-        student.modules_taken[new_id] = module
-
-        new_id = len(module.students_in_module)
-        module.students_in_module[new_id] = student
+        student.modules_taken[mod_id] = module
+        module.students_in_module[stu_id] = student
     #unenroll Student
-    def unenrollStudent(self, module):
-        self.modules_taken.pop(module.id)
-
+    def unenrollStudent(self, stu_id, mod_id):
+        student = self.students[stu_id]
+        student.modules_taken.pop(mod_id) #remove module from student
+        module = self.modules[mod_id]
+        module.students_in_module.pop(stu_id) #remove student from module
 class College(Course):
     def __init__(self):
         self.course = Course("TU060", "Advanced Software Development", \
@@ -408,11 +404,29 @@ class College(Course):
                 self.clear()
                 self.course.viewAllStudents()
                 print(Color("{autoblue}View Student:{/autoblue}"))
-                id = int(input("Student Id: "))
+                query = str(input("Search for a student by id, name or email: "))
                 self.clear()
-                self.course.searchStudent(id)#string validation and checking if item exists already
-                input("Press Enter to return to student menu...")
-                self.studentsMenu()
+                y = self.course.searchStudent(query)#string validation and checking if item exists already
+                if(y>-1):
+                    z = int(input("Edit? Yes: 1, No: 0 :"))
+                    if(z == ""):
+                        z = 0
+                    else:
+                        z = int(y)
+                    if(z == 0):
+                        input("Press Enter to return to student menu...")
+                        self.studentsMenu()
+                    elif(z == 1):
+                        student = self.course.students[y]
+                        name = input("Student Name: ")
+                        student.name = name
+                        email = input("Student Email: ")
+                        student.email = email
+                        self.studentsMenu()
+                else:
+                    input("Press Enter to return to student menu...")
+                    self.studentsMenu()                   
+
             elif(x == 2):#add student
                 self.clear()
                 print(Color("{autoblue}Add new student:{/autoblue}"))
@@ -437,6 +451,20 @@ class College(Course):
                 print(Color("{autoblue}Select course to enroll{/autoblue} "+ self.course.students[stu_id].name +" {autoblue}into:{/autoblue}"))
                 mod_id = int(input("Module Id: "))
                 self.course.enrollStudent(stu_id, mod_id)
+                self.clear()
+                self.course.searchStudent(stu_id)#string validation and checking if item exists already
+                input("Press Enter to return to student menu...")
+                self.studentsMenu()
+            elif(x == 5): #Enrol Student
+                self.clear()
+                self.course.viewAllStudents()
+                print(Color("{autoblue}View Student:{/autoblue}"))
+                stu_id = int(input("Student Id: "))
+                self.clear()
+                self.course.searchStudent(stu_id)#string validation and checking if item exists already
+                print(Color("{autoblue}Select course to unenroll{/autoblue} "+ self.course.students[stu_id].name +" {autoblue}from:{/autoblue}"))
+                mod_id = int(input("Module Id: "))
+                self.course.unenrollStudent(stu_id, mod_id)
                 self.clear()
                 self.course.searchStudent(stu_id)#string validation and checking if item exists already
                 input("Press Enter to return to student menu...")
