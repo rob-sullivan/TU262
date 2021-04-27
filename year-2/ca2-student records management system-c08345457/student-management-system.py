@@ -72,17 +72,9 @@ class Student():
         self.max_cap = max
         #modules a student is taking
         self.modules_taken = {}
-    
-    #return a list of modules a student is taking
-    def getModules(self):
-        num_mod = len(self.modules_taken)
-        if num_mod > 0:
-            print(self.name + "'s modules are: ")
-            for mod_id, mod_name in modules_taken.items():
-                print("id: " + str(mod_id) + ", name: " + mod_name)
-        else:
-            print(self.name + " does not have any modules.")
 
+        
+    
     def __str__(self):
         return "id: " + str(self.id) + ", name: " + self.name + ", email: " +  self.email + ", module limit reached: " + ("Yes" if len(self.modules_taken) == self.max_cap else "No")
 
@@ -94,7 +86,7 @@ class Module():
         self.num_ects = num_ects
         self.max_cap = max
         self.students_in_module = {} # max 5
-    
+
     def getStudents(self):
         num_stu = len(self.students_in_module)
         if num_mod > 0:
@@ -121,28 +113,138 @@ class Course(Student, Module):
         self.max_module_students = 20
 
     #student management
+    #view Student
+    def viewAllStudents(self):
+        # we setup the library table and its header
+        student_table = [
+            ['Id', 'Name', 'Email', 'Modules'],
+        ]
+
+        # we loop through books and add each book to the ascii table
+        #print(self.students)
+
+        for student_id in self.students.keys():
+            student = self.students[student_id]
+
+            qty = int(len(student.modules_taken))
+            #find and colour code qty of modules taken by students
+            modules_qty = "" # we set qty to zero then get the qty from dictionary
+            if qty == self.max_modules_taken: # we set the colour to red to inform the admin that the max level was reached
+                modules_qty = Color("{autored}" + str(qty) + "{/autored}")
+            elif qty > (self.max_modules_taken / 2):
+                modules_qty = Color("{autoyellow}" + str(qty) + "{/autoyellow}") # we want to warn the admin that module level is about to max
+            else:
+                modules_qty = Color("{autogreen}" + str(qty) + "{/autogreen}") # if module qty level is less than half of max colour it green
+
+            s_row = [student_id, student.name, student.email, modules_qty] # we add a student per row
+            student_table.append(s_row) # we add a row to the table using append. which will add to end of dictionary
+        student_list = AsciiTable(student_table) # we add the library table in an ascii table format
+            
+        student_list.title = Color(" {autoblue}Student{/autoblue}") + " list: Showing " + str(len(self.students)) + " students"
+        print("\n" + student_list.table) # we print our ascii table library
+
     #add student
     def addStudent(self, name, email):
         id = len(self.students)
         s = Student(id, name, email, self.max_modules_taken)
         self.students[s.id] = s
+        print(self.students[s.id].name + " added.")
     #delete student
     def deleteStudent(self, id):
         self.students.pop(id)
     #search Student
-    def searchStudent(id):
+    def searchStudent(self, id):
         if id in self.students:
             print(self.students[id])
-    #view Student
-    def viewStudent():
-        if id in self.students:
-            print(self.students[id])
+        # we setup the library table and its header
+
+        student_table = [
+            ['Id', 'Name', 'Email', 'Modules'],
+        ]
+
+        # we loop through books and add each book to the ascii table
+        #print(self.students)
+
+        student = self.students[id]
+
+        qty = int(len(student.modules_taken))
+        #find and colour code qty of modules taken by students
+        modules_qty = "" # we set qty to zero then get the qty from dictionary
+        if qty == self.max_modules_taken: # we set the colour to red to inform the admin that the max level was reached
+            modules_qty = Color("{autored}" + str(qty) + "{/autored}")
+        elif qty > (self.max_modules_taken / 2):
+            modules_qty = Color("{autoyellow}" + str(qty) + "{/autoyellow}") # we want to warn the admin that module level is about to max
+        else:
+            modules_qty = Color("{autogreen}" + str(qty) + "{/autogreen}") # if module qty level is less than half of max colour it green
+
+        s_row = [id, student.name, student.email, modules_qty] # we add a student per row
+        student_table.append(s_row) # we add a row to the table using append. which will add to end of dictionary
+        student_list = AsciiTable(student_table) # we add the library table in an ascii table format
+            
+        student_list.title = Color(" {autoblue}"+ student.name + "{/autoblue}'s") + " details"
+        print("\n" + student_list.table) # we print our ascii table library
+
+        # we setup the library table and its header
+        module_table = [
+            ['Id', 'Name', 'ECTs', 'Students'],
+        ]
+        # we loop through books and add each book to the ascii table
+        #print(self.students)
+
+        for module_id in student.modules_taken.keys():
+            module = student.modules_taken[module_id]
+
+            qty = int(len(student.modules_taken.students_in_module))
+            #find and colour code qty of modules taken by students
+            student_qty = "" # we set qty to zero then get the qty from dictionary
+            if qty == self.max_module_students: # we set the colour to red to inform the admin that the max level was reached
+                student_qty = Color("{autored}" + str(qty) + "{/autored}")
+            elif qty > (self.max_modules_taken / 2):
+                student_qty = Color("{autoyellow}" + str(qty) + "{/autoyellow}") # we want to warn the admin that module level is about to max
+            else:
+                student_qty = Color("{autogreen}" + str(qty) + "{/autogreen}") # if module qty level is less than half of max colour it green
+
+            m_row = [module_id, module.name, module.num_ects, student_qty] # we add a student per row
+            module_table.append(m_row) # we add a row to the table using append. which will add to end of dictionary
+        module_list = AsciiTable(module_table) # we add the library table in an ascii table format
+            
+        module_list.title = Color(" {autoblue}"+ student.name + "{/autoblue} is taking ") + str(len(student.modules_taken)) + " modules"
+        print("\n" + module_list.table) # we print our ascii table library
+    
     #update Student
     def updateStudent(id, name, email):
         self.students[id].name
         self.students[id].email
 
     ##module management##
+    def viewAllModule(self):
+        # we setup the library table and its header
+        module_table = [
+            ['Id', 'Name', 'ECTs', 'Students'],
+        ]
+        # we loop through books and add each book to the ascii table
+        #print(self.students)
+
+        for module_id in self.modules.keys():
+            module = self.modules[module_id]
+
+            qty = int(len(module.students_in_module))
+            #find and colour code qty of modules taken by students
+            student_qty = "" # we set qty to zero then get the qty from dictionary
+            if qty == self.max_module_students: # we set the colour to red to inform the admin that the max level was reached
+                student_qty = Color("{autored}" + str(qty) + "{/autored}")
+            elif qty > (self.max_modules_taken / 2):
+                student_qty = Color("{autoyellow}" + str(qty) + "{/autoyellow}") # we want to warn the admin that module level is about to max
+            else:
+                student_qty = Color("{autogreen}" + str(qty) + "{/autogreen}") # if module qty level is less than half of max colour it green
+
+            m_row = [module_id, module.name, module.num_ects, student_qty] # we add a student per row
+            module_table.append(m_row) # we add a row to the table using append. which will add to end of dictionary
+            module_list = AsciiTable(module_table) # we add the library table in an ascii table format
+            
+        module_list.title = Color(" {autoblue}Module{/autoblue}") + " list: Showing " + str(len(self.modules)) + " modules"
+        print("\n" + module_list.table) # we print our ascii table library
+
     #add module
     def addModule(self, name, num_ects):
         id = len(self.modules)
@@ -151,10 +253,6 @@ class Course(Student, Module):
     #delete Module
     def deleteModule(self, id):
         self.modules.pop(id)
-    #view Module
-    def viewModule(self, id):
-        if id in self.modules:
-            print(self.modules[id])
     #update Module
     def updateModule(self, id, name, num_ects):
         self.students[id].name
@@ -206,11 +304,11 @@ class College(Course):
         ]
         demoStudents = [
             "jon,jon@terminator.com",
-            "sarah, sarah@terminator.com",
-            "conor, conor@terminator.com",
-            "buzz, buzz@toystory.com",
-            "woodie, woodie@toystory.com",
-            "elsa, elsa@frozen.com"
+            "sarah,sarah@terminator.com",
+            "conor,conor@terminator.com",
+            "buzz,buzz@toystory.com",
+            "woodie,woodie@toystory.com",
+            "elsa,elsa@frozen.com"
         ]
         for module in demoModules:
             self.course.addModule(module, 5)
@@ -265,31 +363,33 @@ class College(Course):
             elif(x == 2):
                 self.modulesMenu()
             else:
-                self.clear()
-                print(Color("{autored}Not a valid choice. Try again{/autored}"))
-                input("Press Enter to continue...")
-                self.mainMenu()
+                raise
+                #self.clear()
+                #print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                #input("Press Enter to continue...")
+                #self.mainMenu()
         except:
-            self.clear()
-            print(Color("{autored}Not a choice. Try again{/autored}"))
-            input("Press Enter to continue...")
-            self.mainMenu()
+            raise
+            #self.clear()
+            #print(Color("{autored}Not a choice. Try again{/autored}"))
+            #input("Press Enter to continue...")
+            #self.mainMenu()
 
     def studentsMenu(self):
         self.clear()
         # main title
         print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        self.course.viewAllStudents()
         print("""
         Students Menu:
 
-            1. Current Students
-            2. Update Student Details
-            3. Add Student
-            4. Delete Student
-            5. Enrol Student
-            6. Unenrol Student
+            1. View Student Details
+            2. Add Student
+            3. Delete Student
+            4. Enrol Student
+            5. Unenrol Student
 
-            *Press 0 to go quit*
+            *Press 0 to go back*
         """)
         try:
             x = input("Students Menu: Choose an option: ")
@@ -300,26 +400,46 @@ class College(Course):
                 x = 0
             else:
                 x = int(x)
-
             if(x == 0):
                 self.clear()
-                print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
-                input("Press Enter to continue...")
-                return False #set run to false and quit program
-            elif(x == 1):
-                self.studentMenu()
-            elif(x == 2):
-                self.modulesMenu()
-            else:
-                self.clear()
-                print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                print(Color("{autoblue}Returning to Main Menu{/autoblue}"))
                 input("Press Enter to continue...")
                 self.mainMenu()
+            elif(x == 1):
+                self.clear()
+                self.course.viewAllStudents()
+                print(Color("{autoblue}View Student:{/autoblue}"))
+                id = int(input("Student Id: "))
+                self.clear()
+                self.course.searchStudent(id)#string validation and checking if item exists already
+                input("Press Enter to return to student menu...")
+                self.studentsMenu()
+            elif(x == 2):#add student
+                self.clear()
+                print(Color("{autoblue}Add new student:{/autoblue}"))
+                name = input("Student Name: ")
+                email = input("Student Email: ")
+                self.course.addStudent(name, email)#string validation and checking if item exists already
+                self.studentsMenu()
+            elif(x == 3):#delete student
+                self.clear()
+                self.course.viewAllStudents()
+                print(Color("{autored}Delete student:{/autored}"))
+                id = int(input("Student Id: "))
+                self.course.deleteStudent(id)#string validation and checking if item exists already
+                self.studentsMenu()
+            else:
+                raise
+                #self.clear()
+                #print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                #input("Press Enter to continue...")
+                #self.mainMenu()
         except:
-            self.clear()
-            print(Color("{autored}Not a choice. Try again{/autored}"))
-            input("Press Enter to continue...")
-            self.mainMenu()
+            #self.clear()
+            #print(Color("{autored}Not a choice. Try again{/autored}"))
+            raise
+            #input("Press Enter to continue...")
+            #self.mainMenu()
         #what is your student id
         #what do you want to do
             #see your details
@@ -332,17 +452,17 @@ class College(Course):
         self.clear()
         # main title
         print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        self.course.viewAllModule()
         print("""
         Students Menu:
 
-            1. All Modules
-            2. Update Module Details
-            3. Create Module
-            4. Delete Student
-            5. Enrol Students
-            6. Unenrol Students
+            1. Update Module Details
+            2. Create Module
+            3. Delete Student
+            4. Enrol Students
+            5. Unenrol Students
 
-            *Press 0 to go quit*
+            *Press 0 to go back*
         """)
         try:
             x = input("Students Menu: Choose an option: ")
@@ -356,23 +476,25 @@ class College(Course):
 
             if(x == 0):
                 self.clear()
-                print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
+                print(Color("{autoblue}Returning to Main Menu{/autoblue}"))
                 input("Press Enter to continue...")
-                return False #set run to false and quit program
+                self.mainMenu()
             elif(x == 1):
                 self.studentMenu()
             elif(x == 2):
                 self.modulesMenu()
             else:
-                self.clear()
-                print(Color("{autored}Not a valid choice. Try again{/autored}"))
-                input("Press Enter to continue...")
-                self.mainMenu()
+                raise
+                #self.clear()
+                #print(Color("{autored}Not a valid choice. Try again{/autored}"))
+                #input("Press Enter to continue...")
+                #self.mainMenu()
         except:
-            self.clear()
-            print(Color("{autored}Not a choice. Try again{/autored}"))
-            input("Press Enter to continue...")
-            self.mainMenu()
+            raise
+            #self.clear()
+            #print(Color("{autored}Not a choice. Try again{/autored}"))
+            #input("Press Enter to continue...")
+            #self.mainMenu()
 
 if __name__ == "__main__":
     College()
