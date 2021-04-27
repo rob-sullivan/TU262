@@ -74,7 +74,6 @@ class Student():
     def __str__(self):
         result = str(self.id) + self.name +  self.email
         return result
-
 class Module():
     
     def __init__(self, id, name, num_ects, max):
@@ -95,7 +94,6 @@ class Module():
 
     def __str__(self):
         return "id: " + str(self.id) + ", name: " + self.name + ", ects: " +  str(self.num_ects) + ", full: " + ("Yes" if len(self.students_in_module) == self.max_cap else "No")
-
 class Course(Student, Module):
     
     def __init__(self, code, name, description):
