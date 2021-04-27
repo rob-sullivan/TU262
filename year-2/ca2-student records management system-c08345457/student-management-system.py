@@ -194,7 +194,7 @@ class Course(Student, Module):
         for module_id in student.modules_taken.keys():
             module = student.modules_taken[module_id]
 
-            qty = int(len(student.modules_taken.students_in_module))
+            qty = int(len(module.students_in_module))
             #find and colour code qty of modules taken by students
             student_qty = "" # we set qty to zero then get the qty from dictionary
             if qty == self.max_module_students: # we set the colour to red to inform the admin that the max level was reached
@@ -258,16 +258,15 @@ class Course(Student, Module):
         self.students[id].name
         self.students[id].num_ects
     #enroll Student
-    def enrollStudent(self, student, module):
-        num_mod = len(student.modules_taken)
-        num_stu = len(module.students_in_module)
-        if num_mod < student.max_cap:
-            if num_stu < module.max_cap:
-                self.modules_taken[module.id] = module
-            else:
-                print(module.name + "'s student limit was reached")
-        else:
-            print(student.name + "'s module limit was reached")
+    def enrollStudent(self, stu_id, mod_id):
+        student = self.students[stu_id]
+        module = self.modules[mod_id]
+        
+        new_id = len(student.modules_taken)
+        student.modules_taken[new_id] = module
+
+        new_id = len(module.students_in_module)
+        module.students_in_module[new_id] = student
     #unenroll Student
     def unenrollStudent(self, module):
         self.modules_taken.pop(module.id)
@@ -427,6 +426,20 @@ class College(Course):
                 print(Color("{autored}Delete student:{/autored}"))
                 id = int(input("Student Id: "))
                 self.course.deleteStudent(id)#string validation and checking if item exists already
+                self.studentsMenu()
+            elif(x == 4): #Enrol Student
+                self.clear()
+                self.course.viewAllStudents()
+                print(Color("{autoblue}Select Student to enroll:{/autoblue}"))
+                stu_id = int(input("Student Id: "))
+                self.clear()
+                self.course.viewAllModule()
+                print(Color("{autoblue}Select course to enroll{/autoblue} "+ self.course.students[stu_id].name +" {autoblue}into:{/autoblue}"))
+                mod_id = int(input("Module Id: "))
+                self.course.enrollStudent(stu_id, mod_id)
+                self.clear()
+                self.course.searchStudent(stu_id)#string validation and checking if item exists already
+                input("Press Enter to return to student menu...")
                 self.studentsMenu()
             else:
                 raise
