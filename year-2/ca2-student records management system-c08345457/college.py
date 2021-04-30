@@ -636,6 +636,11 @@ class College(Course):
                 if(y>-1): 
                     print(Color("Enter the IDs of Students to enroll into {autoblue}" + str(self.course.modules[id].name) + "{/autoblue} followed by a comma \',\': "))
                     z = str(input("Student IDs: "))
+                    print(z)
+                    result = z.lower()
+                    result = result.replace(" ", "")
+                    result = result.split(",")
+                    print(result)
                     if(z == ""):
                         z = 0
                     else:
