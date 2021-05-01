@@ -46,7 +46,7 @@ A copy of the GNU General Public License can be found at
 
 
 TODO(rob): form validation on student menu
-TODO(rob): modules menu
+TODO(rob): restrict adding if maxed
 
 """
 """
@@ -56,6 +56,296 @@ from terminaltables import AsciiTable # we are using the ascii table layout.
 from colorclass import Color, Windows # we are using color and windows to color the qty level in the terminal
 from os import system, name # used for clearing terminal function
 
+# This is a boundary class that takes user input and sends it to the controller class.
+class StudentMenuUI():
+    def __init__(self):
+        self.c = CollegeUI()
+        self.studentScreen()
+    def studentScreen(self):
+        print("hello")
+        self.c.clear()
+        # main title
+        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        self.c.cm.viewAllStudents()
+        print("""
+        Students Menu:
+
+            1. View Student Details
+            2. Add Student
+            3. Delete Student
+            4. Enrol Student
+            5. Unenrol Student
+
+            *Press 0 to go back*
+        """)
+        self.studentOptionScreen()
+    def studentOptionScreen(self):
+        try:
+            x = self.c.choice("Students Menu: Choose an option: ") #custom input to handle base 10 error errors
+            
+            
+            if(x == 0):#return to previous menu
+                msg = Color("{autoblue}Returning to Main Menu{/autoblue}")
+                self.c.goBack(msg, self.c.WelcomeScreen)
+            elif(x == 1):#show a student
+               self.studentProfileScreen()
+            elif(x == 2):#add student
+                self.addStudentScreen()
+            elif(x == 3):#delete student
+                self.deleteStudentScreen()
+            elif(x == 4): #Enrol Student
+                self.enrollStudentScreen()
+            elif(x == 5): #Unenrol Student
+                self.unenrollStudentScreen()
+            else:
+                raise
+                #msg = Color("{autored}Not a valid choice. Try again{/autored}")
+                #self.c.goBack(msg, self.WelcomeScreen)
+        except:
+            raise
+            #msg = Color("{autored}Not a valid choice. Try again{/autored}")
+            #self.c.goBack(msg, self.WelcomeScreen)
+    def studentProfileScreen(self):
+        #show a list of all students.
+        self.clear()
+        self.c.cm.viewAllStudents()#show a list of students
+        print(Color("{autoblue}View Student:{/autoblue}"))
+
+        #now we get a search query from the user.
+        query = str(input("Search for a student by id, name or email: "))
+        self.c.clear()
+
+        #with the search query we format it and look for the student
+        y = self.c.cm.searchStudent(query)#string validation and checking if item exists already
+
+        #y will return the student id if found
+        if(y > -1):
+            z = self.c.choice("Edit? Yes: 1, No: 0 : ") #custom input to handle base 10 error errors
+            if(z == 0):
+                msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+                self.c.goBack(msg, self.studentScreen)  
+            elif(z == 1):
+                student = self.c.cm.students[y]
+                name = input("Student Name: ")
+                student.name = name
+                email = input("Student Email: ")
+                student.email = email
+                msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+                self.c.goBack(msg, self.studentScreen)  
+        else:
+            msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+            self.c.goBack(msg, self.studentScreen)  
+    def addStudentScreen():
+        self.clear()
+        print(Color("{autoblue}Add new student:{/autoblue}"))
+        name = input("Student Name: ")
+        email = input("Student Email: ")
+        self.c.cm.addStudent(name, email)#string validation and checking if item exists already
+        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+        self.c.goBack(msg, self.studentsMenu)  
+    def deleteStudentScreen():
+        self.clear()
+        self.c.cm.viewAllStudents()
+        print(Color("{autored}Delete student:{/autored}"))
+        id = int(input("Student Id: "))
+        self.c.cm.deleteStudent(id)#string validation and checking if item exists already
+        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+        self.c.goBack(msg, self.studentsMenu)
+    def enrollStudentScreen():
+        #get the student
+        self.clear()
+        self.c.cm.viewAllStudents()
+        print(Color("{autoblue}Select Student to enroll:{/autoblue}"))
+        stu_id = int(input("Student Id: "))
+
+        #get the module
+        self.clear()
+        self.c.cm.viewAllModule()
+        print(Color("{autoblue}Select cm to enroll{/autoblue} " + self.c.cm.students[stu_id].name + " {autoblue}into:{/autoblue}"))
+        mod_id = int(input("Module Id: "))
+
+        #now enrol the student in the module
+        self.c.cm.enrollStudent(stu_id, mod_id)
+        self.clear()
+        self.c.cm.searchStudent(str(stu_id))#string validation and checking if item exists already
+
+        #now go back to the main student menu
+        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+        self.c.goBack(msg, self.studentsMenu)
+    def unenrollStudentScreen():
+        #get the student
+        self.clear()
+        self.c.cm.viewAllStudents()
+        print(Color("{autoblue}Select Student to enroll:{/autoblue}"))
+        stu_id = int(input("Student Id: "))
+
+        #get the module
+        self.clear()
+        self.c.cm.viewAllModule()
+        print(Color("{autoblue}Select cm to enroll{/autoblue} " + self.c.cm.students[stu_id].name + " {autoblue}into:{/autoblue}"))
+        mod_id = int(input("Module Id: "))
+
+        #now unenrol the student in the module
+        self.c.cm.unenrollStudent(stu_id, mod_id)
+        self.clear()
+        self.c.cm.searchStudent(str(stu_id))#string validation and checking if item exists already
+
+        #now go back to the main student menu
+        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+        self.c.goBack(msg, self.studentsMenu)
+# This is a boundary class that takes user input and sends it to the controller class.
+class ModuleMenuUI():
+    def __init__(self):
+        self.c = CollegeUI()
+        self.moduleScreen()
+    def moduleScreen():
+        self.clear()
+        # main title
+        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        self.c.cm.viewAllModule()
+        print("""
+        Module Menu:
+
+            1. View Module Details
+            2. Add Module
+            3. Delete Module
+            4. Enrol Students
+            5. Unenrol Students
+
+            *Press 0 to go back*
+        """)
+        self.moduleOptionScreen()
+    def moduleOptionScreen(self):
+        try:
+            x = self.c.choice("Module Menu: Choose an option: ") #custom input to handle base 10 error errors
+
+            if(x == 0):#back to main menu
+                msg = Color("{autoblue}Returning to Main Menu{/autoblue}")
+                self.c.goBack(msg, self.c.WelcomeScreen)
+            elif(x == 1):#back show all modules and pick one to edit
+                self.moduleDetailScreen()
+            elif(x == 2):#add new module
+                self.addModuleScreen()
+            elif(x == 3):#delete module
+                self.deleteModuleScreen()
+            elif(x == 4):#bulk enroll
+                self.bulkEnrollStudentScreen()
+            elif(x == 5):#bulk unenroll
+                self.bulkUnenrollStudentScreen()
+            else:
+                raise
+                #msg = Color("{autored}Not a valid choice. Try again{/autored}")
+                #self.c.goBack(msg, self.WelcomeScreen)
+        except:
+            raise
+            #msg = Color("{autored}Not a valid choice. Try again{/autored}")
+            #self.c.goBack(msg, self.WelcomeScreen)
+    def moduleDetailScreen(self):
+        #show a list of all modules.
+        self.clear()#clear the terminal
+        self.c.viewAllModule()#show a list of current modules
+        print(Color("{autoblue}Search Module:{/autoblue}"))
+        
+        #now we get a search query from the user.
+        query = str(input("Search for a module by Id or Name: ")) # enter search term
+        self.clear()
+
+        #with the search query we format it and look for the module
+        y = self.cm.searchModule(query)
+
+        #y will return the module id if found
+        if(y > -1):
+            z = self.c.choice("Edit? Yes: 1, No: 0 : ") #custom input to handle base 10 error errors
+            if(z == 0):
+                msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+                self.c.goBack(msg, self.moduleScreen) 
+            elif(z == 1):
+                module = self.c.cm.modules[y]
+                name = input("Module Name: ")
+                module.name = name
+                ects = input("ECTs: ")
+                module.num_ects = ects
+                msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+                self.c.goBack(msg, self.moduleScreen)  
+        else:
+            msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+            self.c.goBack(msg, self.moduleScreen)  
+    def addModuleScreen(self):
+        self.clear()
+        print(Color("{autoblue}Add new module:{/autoblue}"))
+        name = input("Module Name: ")
+        ect = input("ECT amount: ")
+        self.c.addModule(name, ect)#string validation and checking if item exists already
+        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+        self.c.goBack(msg, self.moduleScreen) 
+    def deleteModuleScreen(self):
+        self.clear()
+        self.c.cm.viewAllModule()
+        print(Color("{autored}Delete Module:{/autored}"))
+        id = int(input("Module Id: "))
+        self.c.cm.deleteModule(id)#string validation and checking if item exists already
+        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+        self.c.goBack(msg, self.moduleScreen) 
+    def bulkEnrollStudentScreen(self):
+        #first we show a list to the user and ask them to pick a module
+        self.clear()
+        self.c.cm.viewAllModule()
+        print(Color("Pick a {autoblue}Module{/autoblue} to enroll students into."))
+        mod_id = int(input("Module Id: "))
+        
+        #now we show that module and the students in it
+        self.clear()
+        y = self.c.cm.searchModule(str(mod_id))
+
+        #we now ask the user to add students to the module
+        if(y > -1): 
+            print(Color("Enter the IDs of Students to enroll into {autoblue}" + str(self.c.cm.modules[mod_id].name) + "{/autoblue} followed by a comma \',\': "))
+            z = str(input("Student IDs: "))
+            if(z == ""):
+                msg = Color("{autoblue}Nothing entered. Press Enter to return to module menu...{/autoblue}")
+                self.c.goBack(msg, self.moduleScreen) 
+            else:
+                result = z.lower()
+                result = result.replace(" ", "")
+                result = result.split(",")
+                print(result)
+                for stu_id in result:
+                    self.c.cm.enrollStudent(stu_id, mod_id)
+                msg = Color("{autoblue}enrolled students in module{/autoblue}")
+                self.c.goBack(msg, self.moduleScreen) 
+        else:
+            msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+            self.c.goBack(msg, self.studentScreen)  
+    def bulkUnenrollStudentScreen(self):
+        #first we show a list to the user and aask them to pick a module
+        self.clear()
+        self.c.cm.viewAllModule()
+        print(Color("Pick a {autoblue}Module{/autoblue} to unenroll students from."))
+        mod_id = int(input("Module Id: "))
+        
+        #now we show that module and the students in it
+        self.clear()
+        y = self.c.cm.searchModule(str(mod_id))
+
+        #we now ask the user to remove students to the module
+        if(y > -1): 
+            print(Color("Enter the IDs of Students to unenroll from {autoblue}" + str(self.c.cm.modules[mod_id].name) + "{/autoblue} followed by a comma \',\': "))
+            z = str(input("Student IDs: "))
+            if(z == ""):
+                msg = Color("{autoblue}Nothing entered. Press Enter to return to module menu...{/autoblue}")
+                self.c.goBack(msg, self.moduleScreen) 
+            else:
+                result = z.lower()
+                result = result.replace(" ", "")
+                result = result.split(",")
+                print(result)
+                for stu_id in result:
+                    self.c.cm.unenrollStudent(stu_id, mod_id)
+                msg = Color("{autoblue}unenrolled students in module{/autoblue}")
+                self.c.goBack(msg, self.moduleScreen) 
+        else:
+            msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
+            self.c.goBack(msg, self.studentScreen)   
 # This is an entity class that holds information about a student.
 class Student():
     def __init__(self, id, name, email, max):
@@ -337,14 +627,13 @@ class CourseManager(Student, Module):
         student.modules_taken.pop(mod_id) #remove module from student     
         module = self.modules[mod_id]
         module.students_in_module.pop(stu_id) #remove student from module
-
-# This is a boundary class that takes user input and sends it to the controller class.
+# This is a boundary domain class that takes user input and sends it to the controller class.
 class CollegeUI(CourseManager, StudentMenuUI, ModuleMenuUI):
     def __init__(self):
         self.cm = CourseManager("TU060", "Advanced Software Development", \
             "MSc in Computer Science Advanced Software Development.", 5, 20)
-        self.demo() #load our demo content of modules and students
-        self.mainMenu() # start the main menu
+        self.demo()
+
     def demo(self):
         demoModules = [
             "Programming Paradigms: Principles & Practice",
@@ -382,10 +671,6 @@ class CollegeUI(CourseManager, StudentMenuUI, ModuleMenuUI):
         for student in demoStudents:
             s = student.split(",")
             self.cm.addStudent(s[0], s[1])
-    def __init__(self):
-        self.c = CourseManager("TU060", "Advanced Software Development", \
-            "MSc in Computer Science Advanced Software Development.", 5, 20)
-        self.welcomeScreen()
     def welcomeScreen(self):
         self.clear()
         # main title
@@ -401,44 +686,21 @@ class CollegeUI(CourseManager, StudentMenuUI, ModuleMenuUI):
         self.welcomeOptions()
     def welcomeOptions(self):
         try:
-            x = choice("Main Menu: Choose an option: ") #custom input to handle base 10 error errors
-
+            x = self.choice("Main Menu: Choose an option: ") #custom input to handle base 10 error errors
             if(x == 0):
                 self.quitApp()#tells user app will close then quits
             elif(x == 1):
-                self.StudentMenuUI()
+                StudentMenuUI().__init__()
             elif(x == 2):
-                self.ModuleMenuUI()
+                ModuleMenuUI().__init__()
             else:
                 raise
-                msg = Color("{autored}Not a valid choice. Try again{/autored}")
-                self.goBack(msg, self.WelcomeScreen)
-
+                #msg = Color("{autored}Not a valid choice. Try again{/autored}")
+                #self.goBack(msg, self.WelcomeScreen)
         except:
             raise
-            msg = Color("{autored}Not a valid choice. Try again{/autored}")
-            self.goBack(msg, self.WelcomeScreen)
-
-        #get the student
-        self.clear()
-        self.c.viewAllStudents()
-        print(Color("{autoblue}View Student:{/autoblue}"))
-        stu_id = int(input("Student Id: "))
-        
-        #get the module
-        self.clear()
-        self.c.searchStudent(str(stu_id))#string validation and checking if item exists already
-        print(Color("{autoblue}Select course to unenroll{/autoblue} "+ self.cm.students[stu_id].name +" {autoblue}from:{/autoblue}"))
-        mod_id = int(input("Module Id: "))
-        
-        #now unenrol the student in the module
-        self.c.unenrollStudent(stu_id, mod_id)
-        self.clear()
-
-        #now go back to the main student menu
-        self.c.searchStudent(str(stu_id))#string validation and checking if item exists already
-        input("Press Enter to return to student menu...")
-        self.studentsMenu()
+            #msg = Color("{autored}Not a valid choice. Try again{/autored}")
+            #self.goBack(msg, self.WelcomeScreen)
     def clear(self): 
         """
         This function was taken from https://www.geeksforgeeks.org/clear-screen-python/ to
@@ -467,303 +729,14 @@ class CollegeUI(CourseManager, StudentMenuUI, ModuleMenuUI):
             x = 0
         else:
             x = int(x)
-        return x   
+        return x
     def quitApp(self):
             self.clear()
             print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
             input("Press Enter to continue...")
             return False #set run to false and quit program
 
-class StudentMenuUI(CollegeUI):
-    def __init__(self):
-        self.c = CollegeUI()
-        self.studentScreen()
-    def studentScreen(self):
-        self.c.clear()
-        # main title
-        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
-        self.c.viewAllStudents()
-        print("""
-        Students Menu:
-
-            1. View Student Details
-            2. Add Student
-            3. Delete Student
-            4. Enrol Student
-            5. Unenrol Student
-
-            *Press 0 to go back*
-        """)
-        self.studentOptions()
-    def studentOptions(self):
-        try:
-            x = c.choice("Students Menu: Choose an option: ") #custom input to handle base 10 error errors
-            
-            if(x == 0):#return to previous menu
-                msg = Color("{autoblue}Returning to Main Menu{/autoblue}")
-                self.c.goBack(msg, self.c.WelcomeScreen)
-            elif(x == 1):#show a student
-               self.studentProfileScreen()
-            elif(x == 2):#add student
-                self.addStudentScreen()
-            elif(x == 3):#delete student
-                self.deleteStudentScreen()
-            elif(x == 4): #Enrol Student
-                self.enrollStudentScreen()
-            elif(x == 5): #Unenrol Student
-                self.unenrollStudentScreen()
-            else:
-                raise
-                msg = Color("{autored}Not a valid choice. Try again{/autored}")
-                self.c.goBack(msg, self.WelcomeScreen)
-        except:
-            raise
-            msg = Color("{autored}Not a valid choice. Try again{/autored}")
-            self.c.goBack(msg, self.WelcomeScreen)
-    def studentProfileScreen(self):
-        #show a list of all students.
-        self.clear()
-        self.c.viewAllStudents()#show a list of students
-        print(Color("{autoblue}View Student:{/autoblue}"))
-
-        #now we get a search query from the user.
-        query = str(input("Search for a student by id, name or email: "))
-        self.c.clear()
-
-        #with the search query we format it and look for the student
-        y = self.c.searchStudent(query)#string validation and checking if item exists already
-
-        #y will return the student id if found
-        if(y > -1):
-            z = self.c.choice("Edit? Yes: 1, No: 0 : ") #custom input to handle base 10 error errors
-            if(z == 0):
-                msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-                self.c.goBack(msg, self.studentScreen)  
-            elif(z == 1):
-                student = self.cm.students[y]
-                name = input("Student Name: ")
-                student.name = name
-                email = input("Student Email: ")
-                student.email = email
-                msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-                self.c.goBack(msg, self.studentScreen)  
-        else:
-            msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-            self.c.goBack(msg, self.studentScreen)  
-    def addStudentScreen():
-        self.clear()
-        print(Color("{autoblue}Add new student:{/autoblue}"))
-        name = input("Student Name: ")
-        email = input("Student Email: ")
-        self.c.addStudent(name, email)#string validation and checking if item exists already
-        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-        self.c.goBack(msg, self.studentsMenu)  
-    def deleteStudentScreen():
-        self.clear()
-        self.c.viewAllStudents()
-        print(Color("{autored}Delete student:{/autored}"))
-        id = int(input("Student Id: "))
-        self.c.deleteStudent(id)#string validation and checking if item exists already
-        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-        self.c.goBack(msg, self.studentsMenu)
-    def enrollStudentScreen():
-        #get the student
-        self.clear()
-        self.c.viewAllStudents()
-        print(Color("{autoblue}Select Student to enroll:{/autoblue}"))
-        stu_id = int(input("Student Id: "))
-
-        #get the module
-        self.clear()
-        self.c.viewAllModule()
-        print(Color("{autoblue}Select cm to enroll{/autoblue} " + self.cm.students[stu_id].name + " {autoblue}into:{/autoblue}"))
-        mod_id = int(input("Module Id: "))
-
-        #now enrol the student in the module
-        self.c.enrollStudent(stu_id, mod_id)
-        self.clear()
-        self.c.searchStudent(str(stu_id))#string validation and checking if item exists already
-
-        #now go back to the main student menu
-        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-        self.c.goBack(msg, self.studentsMenu)
-    def unenrollStudentScreen():
-        #get the student
-        self.clear()
-        self.c.viewAllStudents()
-        print(Color("{autoblue}Select Student to enroll:{/autoblue}"))
-        stu_id = int(input("Student Id: "))
-
-        #get the module
-        self.clear()
-        self.c.viewAllModule()
-        print(Color("{autoblue}Select cm to enroll{/autoblue} " + self.cm.students[stu_id].name + " {autoblue}into:{/autoblue}"))
-        mod_id = int(input("Module Id: "))
-
-        #now unenrol the student in the module
-        self.c.unenrollStudent(stu_id, mod_id)
-        self.clear()
-        self.c.searchStudent(str(stu_id))#string validation and checking if item exists already
-
-        #now go back to the main student menu
-        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-        self.c.goBack(msg, self.studentsMenu)
-class ModuleMenuUI(CollegeUI):
-    def __init__(self):
-        self.c = CollegeUI()
-        self.moduleScreen()
-    def moduleScreen()
-        self.clear()
-        # main title
-        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
-        self.c.viewAllModule()
-        print("""
-        Module Menu:
-
-            1. View Module Details
-            2. Add Module
-            3. Delete Module
-            4. Enrol Students
-            5. Unenrol Students
-
-            *Press 0 to go back*
-        """)
-        self.moduleOptions()
-    def moduleOptions(self):
-        try:
-            x = c.choice("Module Menu: Choose an option: ") #custom input to handle base 10 error errors
-
-            if(x == 0):#back to main menu
-                msg = Color("{autoblue}Returning to Main Menu{/autoblue}")
-                self.c.goBack(msg, self.c.WelcomeScreen)
-            elif(x == 1):#back show all modules and pick one to edit
-                self.moduleDetailScreen()
-            elif(x == 2):#add new module
-                self.addModuleScreen()
-            elif(x == 3):#delete module
-                self.deleteModuleScreen()
-            elif(x == 4):#bulk enroll
-                self.bulkEnrollStudentScreen()
-            elif(x == 5):#bulk unenroll
-                self.bulkUnenrollStudentScreen()
-            else:
-                raise
-                #self.clear()
-                #print(Color("{autored}Not a valid choice. Try again{/autored}"))
-                #input("Press Enter to continue...")
-                #self.mainMenu()
-        except:
-            raise
-            #self.clear()
-            #print(Color("{autored}Not a choice. Try again{/autored}"))
-            #input("Press Enter to continue...")
-            #self.mainMenu()
-    def moduleDetailScreen(self):
-        #show a list of all modules.
-        self.clear()#clear the terminal
-        self.c.viewAllModule()#show a list of current modules
-        print(Color("{autoblue}Search Module:{/autoblue}"))
-        
-        #now we get a search query from the user.
-        query = str(input("Search for a module by Id or Name: ")) # enter search term
-        self.clear()
-
-        #with the search query we format it and look for the module
-        y = self.cm.searchModule(query)
-
-        #y will return the module id if found
-        if(y > -1):
-            z = self.c.choice("Edit? Yes: 1, No: 0 : ") #custom input to handle base 10 error errors
-            if(z == 0):
-                msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-                self.c.goBack(msg, self.moduleScreen) 
-            elif(z == 1):
-                module = self.cm.modules[y]
-                name = input("Module Name: ")
-                module.name = name
-                ects = input("ECTs: ")
-                module.num_ects = ects
-                msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-                self.c.goBack(msg, self.moduleScreen)  
-        else:
-            msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-            self.c.goBack(msg, self.moduleScreen)  
-    def addModuleStudent(self):
-        self.clear()
-        print(Color("{autoblue}Add new module:{/autoblue}"))
-        name = input("Module Name: ")
-        ect = input("ECT amount: ")
-        self.c.addModule(name, ect)#string validation and checking if item exists already
-        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-        self.c.goBack(msg, self.moduleScreen) 
-    def deleteStudentScreen(self):
-        self.clear()
-        self.c.viewAllModule()
-        print(Color("{autored}Delete Module:{/autored}"))
-        id = int(input("Module Id: "))
-        self.c.deleteModule(id)#string validation and checking if item exists already
-        msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-        self.c.goBack(msg, self.moduleScreen) 
-    def bulkEnrollStudentScreen(self):
-        #first we show a list to the user and ask them to pick a module
-        self.clear()
-        self.c.viewAllModule()
-        print(Color("Pick a {autoblue}Module{/autoblue} to enroll students into."))
-        mod_id = int(input("Module Id: "))
-        
-        #now we show that module and the students in it
-        self.clear()
-        y = self.cm.searchModule(str(mod_id))
-
-        #we now ask the user to add students to the module
-        if(y > -1): 
-            print(Color("Enter the IDs of Students to enroll into {autoblue}" + str(self.cm.modules[mod_id].name) + "{/autoblue} followed by a comma \',\': "))
-            z = str(input("Student IDs: "))
-            if(z == ""):
-                msg = Color("{autoblue}Nothing entered. Press Enter to return to module menu...{/autoblue}")
-                self.c.goBack(msg, self.moduleScreen) 
-            else:
-                result = z.lower()
-                result = result.replace(" ", "")
-                result = result.split(",")
-                print(result)
-                for stu_id in result:
-                    self.c.enrollStudent(stu_id, mod_id)
-                msg = Color("{autoblue}enrolled student into course{/autoblue}")
-                self.c.goBack(msg, self.moduleScreen) 
-        else:
-            msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
-            self.c.goBack(msg, self.studentScreen)  
-    def bulkUnenrollStudentScreen(self):
-        #first we show a list to the user and aask them to pick a module
-        self.clear()
-        self.cm.viewAllModule()
-        print(Color("Pick a {autoblue}Module{/autoblue} to unenroll students from."))
-        mod_id = int(input("Module Id: "))
-        
-        #now we show that module and the students in it
-        self.clear()
-        y = self.cm.searchModule(str(mod_id))
-
-        #we now ask the user to remove students to the module
-        if(y>-1): 
-            print(Color("Enter the IDs of Students to unenroll from {autoblue}" + str(self.cm.modules[mod_id].name) + "{/autoblue} followed by a comma \',\': "))
-            z = str(input("Student IDs: "))
-            if(z == ""):
-                input("Nothing entered. Press Enter to return to module menu...")
-                self.modulesMenu()
-            else:
-                result = z.lower()
-                result = result.replace(" ", "")
-                result = result.split(",")
-                print(result)
-                for stu_id in result:
-                    self.cm.unenrollStudent(stu_id, mod_id)
-                self.modulesMenu()
-        else:
-            input("Press Enter to return to module menu...")
-            self.modulesMenu() 
 if __name__ == "__main__":
-    #CollegeUI()
-    MainMenuUI()
+    university = CollegeUI()
+    university.welcomeScreen()
 
