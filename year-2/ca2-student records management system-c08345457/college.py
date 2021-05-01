@@ -333,7 +333,7 @@ class CourseManager(Student, Module):
     def unenrollStudent(self, stu_id, mod_id):
         stu_id = int(stu_id)
         mod_id = int(mod_id)
-        
+
         student = self.students[stu_id]
         student.modules_taken.pop(mod_id) #remove module from student
         
@@ -703,6 +703,86 @@ class CollegeUI(CourseManager):
             #input("Press Enter to continue...")
             #self.mainMenu()
 
+
+class MainMenuUI(CollegeUI):
+    def __init__(self):
+        self.c = CollegeUI()
+        self.welcomeScreen()
+
+    def WelcomeScreen(self):
+        self.clear()
+        # main title
+        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        print("""
+        Main Menu:
+
+            1. Students
+            2. Modules
+
+            *Press 0 to exit*
+        """)
+        self.welcomeOptions()
+    def welcomeOptions(self):
+        try:
+            x = getInput("Main Menu: Choose an option: ") #custom input to handle base 10 error errors
+
+            if(x == 0):
+                self.quitApp()#tells user app will close then quits
+            elif(x == 1):
+                self.studentScreen()
+            elif(x == 2):
+                self.modulesMenu()
+            else:
+                raise
+                msg = Color("{autored}Not a valid choice. Try again{/autored}")
+                self.goBack(msg, self.WelcomeScreen)
+
+        except:
+            raise
+                msg = Color("{autored}Not a valid choice. Try again{/autored}")
+                self.goBack(msg, self.WelcomeScreen)
+    def studentScreen(self):
+        self.clear()
+        # main title
+        print("** Welcome to " + Color("{autoblue}pyLearn{/autoblue}") + " College Management System ** \nCreated by Rob Sullivan v1.0.0")
+        self.cm.viewAllStudents()
+        print("""
+        Students Menu:
+
+            1. View Student Details
+            2. Add Student
+            3. Delete Student
+            4. Enrol Student
+            5. Unenrol Student
+
+            *Press 0 to go back*
+        """)
+        self.studentOptions()
+    def studentOptions(self):
+        pass
+    def goBack(self, msg, action):
+        self.clear()
+        print(msg)
+        input("Press Enter to continue...")
+        method_to_run = action()
+        return method_to_run
+
+    def getInput(self, msg):
+        x = input(msg)
+        #used to fix base 10 error, 
+        # # just hitting enter will close the program
+        if(x == ""):
+            x = 0
+        else:
+            x = int(x)
+        return x
+
+    def quitApp(self):
+            self.clear()
+            print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
+            input("Press Enter to continue...")
+            return False #set run to false and quit program
 if __name__ == "__main__":
-    CollegeUI()
+    #CollegeUI()
+    MainMenuUI()
 
