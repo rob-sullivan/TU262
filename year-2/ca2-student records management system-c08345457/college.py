@@ -48,10 +48,9 @@ A copy of the GNU General Public License can be found at
 <http://www.gnu.org/licenses/>.
 
 
-TODO(rob): form validation on student menu. #import re and use regular expressions in choice function to filter out unwanted input behaviour
-TODO(rob): restrict adding if maxed
 TODO(rob): form validation on bulk adding students
-TODO(rob): checking if student already part of module/ module already taken by student.
+TODO(rob): bulk add student returns error "RuntimeError: dictionary changed 
+            size during iteration". interate over copied list required first.
 
 """
 """
@@ -329,38 +328,58 @@ class CourseManager(Student, Module):
 
         student = self.students[stu_id]
         module = self.modules[mod_id]
-        
-        #check if student can take more classes
-        #student.max_cap
-        if(len(student.modules_taken) !== max_cap):
-            #check if module taken by student
-            for mod in student.modules_taken.keys()
-                if(mod !== mod_id):
-                    student.modules_taken[mod_id] = module
-                else:
-                    print(student.name + " is already taking " + module.name)
-        else:
-            print(student.name + " can't take anymore classes. Unenroll first.")
 
-        #check if module is not full
-        if(len(module.students_in_module) !== module.max_cap):
-            #check if student in module
-            for stu in module.students_in_module.keys()
-                if(stu !== stu_id):
-                    module.students_in_module[stu_id] = student
-                else:
-                    print(module.nam + " shows " + student.name + " is enrolled in it")
+        #check if student is in any classes first
+        num_mod = len(student.modules_taken)
+        if (num_mod > 0):
+            #check if student can take more classes
+            if( num_mod != student.max_cap):    
+                #check if module taken by student
+                for mod in student.modules_taken.keys():
+                    if(mod != mod_id):
+                        student.modules_taken[mod_id] = module
+                    else:
+                        print(Color("{autored}Unsuccessful:{/autored} ") + student.name + " is already taking " + module.name)
+            else:
+                print(Color("{autored}Unsuccessful:{/autored} ") + student.name + " can't take anymore classes. Unenroll first.")
         else:
-            print(module.name + " is full. Unenroll first.")
-            
+            student.modules_taken[mod_id] = module
+            print("\n" + Color("{autogreen}Success:{/autogreen} ") + "enrolled " + student.name + " to " + module.name)
+        
+        #check if module has any students in it.
+        num_stu = len(module.students_in_module)  
+        if(num_stu > 0):
+            #check if module is not full
+            if(num_stu != module.max_cap):
+                #check if student in module
+                for stu in module.students_in_module.keys():
+                    if(stu != stu_id):
+                        module.students_in_module[stu_id] = student
+                    else:
+                        print(Color("{autored}Unsuccessful:{/autored} ")  + module.name + " shows " + student.name + " is enrolled in it \n")
+            else:
+                print(Color("{autored}Unsuccessful:{/autored} ")  + module.name + " is full. Unenroll first. \n")
+        else:
+            module.students_in_module[stu_id] = student
+            print(Color("{autogreen}Success:{/autogreen} ") + module.name + " now shows " + student.name + " enrolled.")
     #unenroll Student
     def unenrollStudent(self, stu_id, mod_id):
         stu_id = int(stu_id)
         mod_id = int(mod_id)
+
         student = self.students[stu_id]
-        student.modules_taken.pop(mod_id) #remove module from student     
         module = self.modules[mod_id]
-        module.students_in_module.pop(stu_id) #remove student from module
+        found = False
+        if(module in student.modules_taken.values()):#
+            student.modules_taken.pop(mod_id) #remove module from student
+            print(Color("{autogreen}Success:{/autogreen} ") + student.name + " now removed from " + module.name + ".")
+        else:
+            print(Color("{autored}Unsuccessful:{/autored} ")  + student.name + " not enrolled in " + module.name + ". \n")
+        if(student in module.students_in_module.values()): 
+            module.students_in_module.pop(stu_id) #remove student from module
+            print(Color("{autogreen}Success:{/autogreen} ") + module.name + " now shows " + student.name + " removed.")
+        else:
+            print(Color("{autored}Unsuccessful:{/autored} ")  + module.name + " doesn't have a student called " + student.name + " enrolled. \n")
 # This is a boundary class that takes user input and sends it to the controller class.
 class CollegeUI(CourseManager):
     def __init__(self):
@@ -513,8 +532,8 @@ class CollegeUI(CourseManager):
         self.clear()
         self.cm.viewAllStudents()
         print(Color("{autogreen}Add new student:{/autogreen}"))
-        name = input("Student Name: ", "text")
-        email = input("Student Email: ", "email")
+        name = self.choice("Student Name: ", "text")
+        email = self.choice("Student Email: ", "email")
         self.cm.addStudent(name, email)#string validation and checking if item exists already
         msg = Color("{autoblue}returning to student menu...{/autoblue}")
         self.goBack(msg, self.studentScreen)  
@@ -533,16 +552,18 @@ class CollegeUI(CourseManager):
         print(Color("{autoblue}Select Student to enroll:{/autoblue}"))
         stu_id = self.choice("Student Id: ", "numbers")
 
+
         #get the module
         self.clear()
         self.cm.viewAllModule()
-        print(Color("{autoblue}Select cm to enroll{/autoblue} " + self.cm.students[stu_id].name + " {autoblue}into:{/autoblue}"))
+        print(Color("{autoblue}Select Module to enroll{/autoblue} " + self.cm.students[stu_id].name + " {autoblue}into:{/autoblue}"))
         mod_id = self.choice("Module Id: ", "numbers")
-
         #now enrol the student in the module
         self.cm.enrollStudent(stu_id, mod_id)
+        input("Press Enter to continue...") #use to wait so user can check
         self.clear()
         self.cm.searchStudent(str(stu_id))#string validation and checking if item exists already
+        input("Press Enter to continue...") #use to wait so user can check
 
         #now go back to the main student menu
         msg = Color("{autoblue}returning to student menu...{/autoblue}")
@@ -562,9 +583,10 @@ class CollegeUI(CourseManager):
 
         #now unenrol the student in the module
         self.cm.unenrollStudent(stu_id, mod_id)
+        input("Press Enter to continue...") #use to wait so user can check
         self.clear()
         self.cm.searchStudent(str(stu_id))#string validation and checking if item exists already
-
+        input("Press Enter to continue...") #use to wait so user can check
         #now go back to the main student menu
         msg = Color("{autoblue}returning to student menu...{/autoblue}")
         self.goBack(msg, self.studentScreen)
@@ -679,9 +701,8 @@ class CollegeUI(CourseManager):
                 result = z.lower()
                 result = result.replace(" ", "")
                 result = result.split(",")
-                print(result)
                 for stu_id in result:
-                    self.cm.enrollStudent(stu_id, mod_id)
+                    self.cm.enrollStudent(stu_id, mod_id, result)
                 msg = Color("{autoblue}enrolled students in module{/autoblue}")
                 self.goBack(msg, self.moduleScreen) 
         else:
@@ -738,15 +759,14 @@ class CollegeUI(CourseManager):
         input("Press Enter to continue...")
         method_to_run = action()
         return method_to_run   
-    def choice(self, msg, type="binary"):#form validation default is binary choice
+    def choice(self, user_input, type="binary"):#form validation default is binary choice
         #type="numbers"
+        x = input(user_input)
         if(type=="binary"):#used to fix base 10 error and hitting spacebar or enter on empty string
             pattern = "[0-1]+"
-            x = input(msg) 
-
             valid = False
             valid_binary = 0
-            while !valid:
+            while not valid:
                 if(re.search(pattern, str(x))):
                     valid = True
                     valid_binary = int(x)
@@ -756,11 +776,10 @@ class CollegeUI(CourseManager):
                     x = str(input(msg))
             return valid_binary
         elif(type=="text"):
-            pattern = "[a-zA-Z]+\s[a-zA-Z]+"
-            x = input(msg)
+            pattern = "[a-zA-Z]+"
             valid = False
             valid_text = ""
-            while !valid:
+            while not valid:
                 if(re.search(pattern, str(x))):
                     valid = True
                     valid_text = str(x)
@@ -777,10 +796,9 @@ class CollegeUI(CourseManager):
             #finally we only accept a .com or a .ie email address
             # This was adapted from https://www.youtube.com/watch?v=UQQsYXa1EHs
             pattern = "[a-zA-Z0-9]+@[a-zA-Z]+\.(com|ie)"
-            x = input(msg)
             valid = False
             valid_email = ""
-            while !valid:
+            while not valid:
                 if(re.search(pattern, str(x))):
                     valid = True
                     valid_email = str(x)
@@ -791,10 +809,9 @@ class CollegeUI(CourseManager):
             return valid_email
         elif(type=="numbers"):
             pattern = "[0-9]+"
-            x = input(msg)
             valid = False
             valid_numbers = ""
-            while !valid:
+            while not valid:
                 if(re.search(pattern, str(x))):
                     valid = True
                     valid_numbers = int(x)
@@ -804,7 +821,6 @@ class CollegeUI(CourseManager):
                     x = str(input(msg))
             return valid_numbers
         elif(type=="any"):#everything accepted. Used for search queries
-            x = input(msg)
             return str(x)     
     def quitApp(self):
         self.clear()
