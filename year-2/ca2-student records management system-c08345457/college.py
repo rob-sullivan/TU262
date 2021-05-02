@@ -330,8 +330,24 @@ class CourseManager(Student, Module):
         student = self.students[stu_id]
         module = self.modules[mod_id]
         
-        student.modules_taken[mod_id] = module
-        module.students_in_module[stu_id] = student
+        #check if student can take more classes
+        
+        #check if module taken by student
+        for mod in student.modules_taken.keys()
+            if(mod !== mod_id):
+                student.modules_taken[mod_id] = module
+            else:
+                print(student.name + " is already taking " + module.name)
+
+        #check if module is not full
+
+        #check if student in module
+        for stu in module.students_in_module.keys()
+            if(stu !== stu_id):
+                module.students_in_module[stu_id] = student
+            else:
+                print(module.nam + " shows " + student.name + " is enrolled in it")
+
     #unenroll Student
     def unenrollStudent(self, stu_id, mod_id):
         stu_id = int(stu_id)
@@ -398,7 +414,7 @@ class CollegeUI(CourseManager):
         self.welcomeOptions()
     def welcomeOptions(self):
         try:
-            x = self.choice("Main Menu: Choose an option: ") #custom input to handle base 10 error errors
+            x = self.choice("Main Menu: Choose an option: ", "numbers") #custom input to handle base 10 error errors
             if(x == 0):
                 self.quitApp()#tells user app will close then quits
             elif(x == 1):
@@ -434,7 +450,7 @@ class CollegeUI(CourseManager):
         self.studentOptionScreen()
     def studentOptionScreen(self):
         try:
-            x = self.choice("Students Menu: Choose an option: ") #custom input to handle base 10 error errors
+            x = self.choice("Students Menu: Choose an option: ", "numbers") #custom input to handle base 10 error errors
             
             
             if(x == 0):#return to previous menu
@@ -465,7 +481,7 @@ class CollegeUI(CourseManager):
         print(Color("{autoblue}View Student:{/autoblue}"))
 
         #now we get a search query from the user.
-        query = self.choice("Search for a student by id, name or email: ","text")
+        query = self.choice("Search for a student by id, name or email: ","any")
         self.clear()
 
         #with the search query we format it and look for the student
@@ -473,7 +489,7 @@ class CollegeUI(CourseManager):
 
         #y will return the student id if found
         if(y > -1):
-            z = self.choice("Edit? Yes: 1, No: 0 : ") #custom input to handle base 10 error errors
+            z = self.choice("Edit? Yes: 1, No: 0 : ", "binary") #custom input to handle base 10 error errors
             if(z == 0):
                 msg = Color("{autoblue}returning to student menu...{/autoblue}")
                 self.goBack(msg, self.studentScreen)  
@@ -501,7 +517,7 @@ class CollegeUI(CourseManager):
         self.clear()
         self.cm.viewAllStudents()
         print(Color("{autored}Delete student:{/autored}"))
-        id = int(input("Student Id: "))
+        id = self.choice("Student Id: ", "numbers")
         self.cm.deleteStudent(id)#string validation and checking if item exists already
         msg = Color("{autoblue}returning to student menu...{/autoblue}")
         self.goBack(msg, self.studentScreen)
@@ -510,13 +526,13 @@ class CollegeUI(CourseManager):
         self.clear()
         self.cm.viewAllStudents()
         print(Color("{autoblue}Select Student to enroll:{/autoblue}"))
-        stu_id = int(input("Student Id: "))
+        stu_id = self.choice("Student Id: ", "numbers")
 
         #get the module
         self.clear()
         self.cm.viewAllModule()
         print(Color("{autoblue}Select cm to enroll{/autoblue} " + self.cm.students[stu_id].name + " {autoblue}into:{/autoblue}"))
-        mod_id = int(input("Module Id: "))
+        mod_id = self.choice("Module Id: ", "numbers")
 
         #now enrol the student in the module
         self.cm.enrollStudent(stu_id, mod_id)
@@ -531,13 +547,13 @@ class CollegeUI(CourseManager):
         self.clear()
         self.cm.viewAllStudents()
         print(Color("{autoblue}Select Student to enroll:{/autoblue}"))
-        stu_id = int(input("Student Id: "))
+        stu_id = self.choice("Student Id: ", "numbers")
 
         #get the module
         self.clear()
         self.cm.viewAllModule()
         print(Color("{autoblue}Select cm to enroll{/autoblue} " + self.cm.students[stu_id].name + " {autoblue}into:{/autoblue}"))
-        mod_id = int(input("Module Id: "))
+        mod_id = self.choice("Module Id: ", "numbers")
 
         #now unenrol the student in the module
         self.cm.unenrollStudent(stu_id, mod_id)
@@ -567,7 +583,7 @@ class CollegeUI(CourseManager):
         self.moduleOptionScreen()
     def moduleOptionScreen(self):
         try:
-            x = self.choice("Module Menu: Choose an option: ") #custom input to handle base 10 error errors
+            x = self.choice("Module Menu: Choose an option: ", "numbers") #custom input to handle base 10 error errors
 
             if(x == 0):#back to main menu
                 msg = Color("{autoblue}Returning to Main Menu{/autoblue}")
@@ -597,7 +613,7 @@ class CollegeUI(CourseManager):
         print(Color("{autoblue}Search Module:{/autoblue}"))
         
         #now we get a search query from the user.
-        query = str(input("Search for a module by Id or Name: ")) # enter search term
+        query = self.choice("Search for a module by Id or Name: ", "any") # enter search term
         self.clear()
 
         #with the search query we format it and look for the module
@@ -605,15 +621,15 @@ class CollegeUI(CourseManager):
 
         #y will return the module id if found
         if(y > -1):
-            z = self.choice("Edit? Yes: 1, No: 0 : ") #custom input to handle base 10 error errors
+            z = self.choice("Edit? Yes: 1, No: 0 : ", "binary") #custom input to handle base 10 error errors
             if(z == 0):
                 msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
                 self.goBack(msg, self.moduleScreen) 
             elif(z == 1):
                 module = self.cm.modules[y]
-                name = input("Module Name: ")
+                name = self.choice("Module Name: ", "text")
                 module.name = name
-                ects = input("ECTs: ")
+                ects = self.choice("ECTs: ", "numbers")
                 module.num_ects = ects
                 msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
                 self.goBack(msg, self.moduleScreen)  
@@ -623,8 +639,8 @@ class CollegeUI(CourseManager):
     def addModuleScreen(self):
         self.clear()
         print(Color("{autoblue}Add new module:{/autoblue}"))
-        name = input("Module Name: ")
-        ect = input("ECT amount: ")
+        name = self.choice("Module Name: ", "text")
+        ect = self.choice("ECT amount: ", "numbers")
         self.addModule(name, ect)#string validation and checking if item exists already
         msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
         self.goBack(msg, self.moduleScreen) 
@@ -632,7 +648,7 @@ class CollegeUI(CourseManager):
         self.clear()
         self.cm.viewAllModule()
         print(Color("{autored}Delete Module:{/autored}"))
-        id = int(input("Module Id: "))
+        id = self.choice("Module Id: ", "numbers")
         self.cm.deleteModule(id)#string validation and checking if item exists already
         msg = Color("{autoblue}Press Enter to return to student menu...{/autoblue}")
         self.goBack(msg, self.moduleScreen) 
@@ -641,7 +657,7 @@ class CollegeUI(CourseManager):
         self.clear()
         self.cm.viewAllModule()
         print(Color("Pick a {autoblue}Module{/autoblue} to enroll students into."))
-        mod_id = int(input("Module Id: "))
+        mod_id = self.choice("Module Id: ", "numbers")
         
         #now we show that module and the students in it
         self.clear()
@@ -650,7 +666,7 @@ class CollegeUI(CourseManager):
         #we now ask the user to add students to the module
         if(y > -1): 
             print(Color("Enter the IDs of Students to enroll into {autoblue}" + str(self.cm.modules[mod_id].name) + "{/autoblue} followed by a comma \',\': "))
-            z = str(input("Student IDs: "))
+            z = self.choice("Student IDs: ", "any")
             if(z == ""):
                 msg = Color("{autoblue}Nothing entered. Press Enter to return to module menu...{/autoblue}")
                 self.goBack(msg, self.moduleScreen) 
@@ -671,7 +687,7 @@ class CollegeUI(CourseManager):
         self.clear()
         self.cm.viewAllModule()
         print(Color("Pick a {autoblue}Module{/autoblue} to unenroll students from."))
-        mod_id = int(input("Module Id: "))
+        mod_id = self.choice("Module Id: ", "numbers")
         
         #now we show that module and the students in it
         self.clear()
@@ -718,32 +734,34 @@ class CollegeUI(CourseManager):
         method_to_run = action()
         return method_to_run   
     def choice(self, msg, type="binary"):#form validation default is binary choice
-        #import re and use regular expressions to filter out unwanted input behaviour
         #type="numbers"
-        if(type=="binary"):
+        if(type=="binary"):#used to fix base 10 error and hitting spacebar or enter on empty string
+            pattern = "[0-1]+"
             x = input(msg) 
-            #used to fix base 10 error or just hitting enter will default to zero
-            if(x == ""):
-                x = 0
-            elif(x == " "):
-                x = 0
-            elif(len(x)>1):
-                x = 0
-            else:
-                x = int(x)
-            return x
+
+            valid = False
+            valid_binary = 0
+            while !valid:
+                if(re.search(pattern, str(x))):
+                    valid = True
+                    valid_binary = int(x)
+                else:
+                    valid = False
+                    msg = Color("{autored}Only 1 or 0 accepted{/autored}") + ". Try again: "
+                    x = str(input(msg))
+            return valid_binary
         elif(type=="text"):
             pattern = "[a-zA-Z]+\s[a-zA-Z]+"
             x = input(msg)
             valid = False
             valid_text = ""
             while !valid:
-                if(re.search(pattern, x)):
+                if(re.search(pattern, str(x))):
                     valid = True
                     valid_text = str(x)
                 else:
                     valid = False
-                    msg = Color("{autored}Invalid Text{/autored}") + ". Try again: "
+                    msg = Color("{autored}Only text accepted{/autored}") + ". Try again: "
                     x = str(input(msg))
             return valid_text
         elif(type=="email"):#email validation
@@ -758,17 +776,31 @@ class CollegeUI(CourseManager):
             valid = False
             valid_email = ""
             while !valid:
-                if(re.search(pattern, x)):
+                if(re.search(pattern, str(x))):
                     valid = True
                     valid_email = str(x)
                 else:
                     valid = False
-                    msg = Color("{autored}Invalid Email{/autored}") + ". Try again: "
+                    msg = Color("{autored}Invalid email{/autored}") + ". Try again: "
                     x = str(input(msg))
             return valid_email
         elif(type=="numbers"):
-            return int(x)
-            
+            pattern = "[0-9]+"
+            x = input(msg)
+            valid = False
+            valid_numbers = ""
+            while !valid:
+                if(re.search(pattern, str(x))):
+                    valid = True
+                    valid_numbers = int(x)
+                else:
+                    valid = False
+                    msg = Color("{autored}Only numbers accepted{/autored}") + ". Try again: "
+                    x = str(input(msg))
+            return valid_numbers
+        elif(type=="any"):#everything accepted. Used for search queries
+            x = input(msg)
+            return str(x)     
     def quitApp(self):
         self.clear()
         print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
