@@ -29,7 +29,7 @@ This program was made in Python3 3.8.8. python3 --version = 3.8.8
 Installation & Running
  - pip3 install terminaltables # https://robpol86.github.io/terminaltables/install.html
  - pip3 install colorclass # https://pypi.org/project/colorclass/
- - python3 ./library.py
+ - python3 ./college.py
 
 Future Scope:
 -create a class for student menu and modules menu
@@ -102,11 +102,10 @@ class CourseManager(Student, Module):
 
         self.students = {} #students
         self.modules = {} #modules
-
     #student management
     #view Student
     def viewAllStudents(self):
-        # we setup the library table and its header
+        # we setup the student table and its header
         student_table = [
             ['Id', 'Name', 'Email', 'Modules'],
         ]
@@ -129,10 +128,10 @@ class CourseManager(Student, Module):
 
             s_row = [student_id, student.name, student.email, modules_qty] # we add a student per row
             student_table.append(s_row) # we add a row to the table using append. which will add to end of dictionary
-        student_list = AsciiTable(student_table) # we add the library table in an ascii table format
+        student_list = AsciiTable(student_table) # we add the student table in an ascii table format
             
         student_list.title = Color(" {autoblue}Student{/autoblue}") + " list: Showing " + str(len(self.students)) + " students"
-        print("\n" + student_list.table) # we print our ascii table library
+        print("\n" + student_list.table) # we print our ascii table
     #add student
     def addStudent(self, name, email):
         id = len(self.students)
@@ -172,9 +171,9 @@ class CourseManager(Student, Module):
             student_list = AsciiTable(student_table) # we add the library table in an ascii table format
                 
             student_list.title = Color(" {autoblue}"+ student.name + "{/autoblue}'s") + " details"
-            print("\n" + student_list.table) # we print our ascii table library
+            print("\n" + student_list.table) # we print our ascii table
 
-            # we setup the library table and its header
+            # we setup the modules table and its header
             module_table = [
                 ['Row', 'Name', 'ECTs', 'Students'],
             ]
@@ -196,10 +195,10 @@ class CourseManager(Student, Module):
 
                 m_row = [module_id, module.name, module.num_ects, student_qty] # we add a student per row
                 module_table.append(m_row) # we add a row to the table using append. which will add to end of dictionary
-            module_list = AsciiTable(module_table) # we add the library table in an ascii table format
+            module_list = AsciiTable(module_table) # we add the modules table in an ascii table format
                 
             module_list.title = Color(" {autoblue}"+ student.name + "{/autoblue} is taking ") + str(len(student.modules_taken)) + " modules"
-            print("\n" + module_list.table) # we print our ascii table library
+            print("\n" + module_list.table) # we print our ascii table
             return student.id
         else:
             print("Search: no result found..")
@@ -211,7 +210,7 @@ class CourseManager(Student, Module):
     ##module management##
     #view module
     def viewAllModule(self):
-        # we setup the library table and its header
+        # we setup the modules table and its header
         module_table = [
             ['Id', 'Name', 'ECTs', 'Students'],
         ]
@@ -233,10 +232,10 @@ class CourseManager(Student, Module):
 
             m_row = [module_id, module.name, module.num_ects, student_qty] # we add a student per row
             module_table.append(m_row) # we add a row to the table using append. which will add to end of dictionary
-        module_list = AsciiTable(module_table) # we add the library table in an ascii table format
+        module_list = AsciiTable(module_table) # we add the modules table in an ascii table format
             
         module_list.title = Color(" {autoblue}Module{/autoblue}") + " list: Showing " + str(len(self.modules)) + " modules"
-        print("\n" + module_list.table) # we print our ascii table library
+        print("\n" + module_list.table) # we print our ascii table
     #add module
     def addModule(self, name, num_ects):
         id = len(self.modules)
@@ -256,7 +255,7 @@ class CourseManager(Student, Module):
                 break
             #show list of found items and let the user pick one. Then set id to that.
         if(found):
-            # we setup the library table and its header
+            # we setup the modules table and its header
             module_table = [
                 ['Id', 'Name', 'ECTs', 'Students'],
             ]
@@ -274,13 +273,13 @@ class CourseManager(Student, Module):
 
             m_row = [module.id, module.name, module.num_ects, student_qty] # we add a student per row
             module_table.append(m_row) # we add a row to the table using append. which will add to end of dictionary
-            module_list = AsciiTable(module_table) # we add the library table in an ascii table format
+            module_list = AsciiTable(module_table) # we add the modules table in an ascii table format
 
             module_list.title = Color(" {autoblue}"+ module.name + "{/autoblue}'s") + " details" 
-            print("\n" + module_list.table) # we print our ascii table library
+            print("\n" + module_list.table) # we print our ascii table
             
             #add students list
-            # we setup the library table and its header
+            # we setup the student table and its header
             student_table = [
                 ['Id', 'Name', 'Email', 'Modules'],
             ]
@@ -310,9 +309,9 @@ class CourseManager(Student, Module):
 
                     s_row = [student_id, student.name, student.email, modules_qty] # we add a student per row
                     student_table.append(s_row) # we add a row to the table using append. which will add to end of dictionary
-            student_list = AsciiTable(student_table) # we add the library table in an ascii table format       
+            student_list = AsciiTable(student_table) # we add the student table in an ascii table format       
             student_list.title = Color(" {autoblue}Students{/autoblue}") + " enrolled: Showing " + str(len(module.students_in_module)) + " enrolled"
-            print("\n" + student_list.table) # we print our ascii table library
+            print("\n" + student_list.table) # we print our ascii table
             return module.id
         else:
             print("Search: no result found..")
@@ -446,13 +445,13 @@ class CollegeUI(CourseManager):
             elif(x == 2):
                 self.moduleScreen()
             else:
-                raise
-                #msg = Color("{autored}Not a valid choice. Try again{/autored}")
-                #self.goBack(msg, self.WelcomeScreen)
+                #raise
+                msg = Color("{autored}An issue occurred. Try again{/autored}")
+                self.goBack(msg, self.welcomeScreen)
         except:
-            raise
-            #msg = Color("{autored}Not a valid choice. Try again{/autored}")
-            #self.goBack(msg, self.WelcomeScreen)
+            #raise
+            msg = Color("{autored}An issue occurred. Try again{/autored}")
+            self.goBack(msg, self.welcomeScreen)
     #student menu
     def studentScreen(self):
         print("hello")
@@ -491,13 +490,13 @@ class CollegeUI(CourseManager):
             elif(x == 5): #Unenrol Student
                 self.unenrollStudentScreen()
             else:
-                raise
-                #msg = Color("{autored}Not a valid choice. Try again{/autored}")
-                #self.goBack(msg, self.WelcomeScreen)
+                #raise
+                msg = Color("{autored}An issue occurred. Try again{/autored}")
+                self.goBack(msg, self.welcomeScreen)
         except:
-            raise
-            #msg = Color("{autored}Not a valid choice. Try again{/autored}")
-            #self.goBack(msg, self.WelcomeScreen)
+            #raise
+            msg = Color("{autored}An issue occurred. Try again{/autored}")
+            self.goBack(msg, self.welcomeScreen)
     def studentProfileScreen(self):
         #show a list of all students.
         self.clear()
@@ -602,11 +601,9 @@ class CollegeUI(CourseManager):
             1. View Module Details
             2. Add Module
             3. Delete Module
-            4. Enrol Students
-            5. Unenrol Students
 
             *Press 0 to go back*
-        """)
+        """) #4. Enrol Students and 5. Unenrol Students removed due to list changing error, see TODO up top
         self.moduleOptionScreen()
     def moduleOptionScreen(self):
         try:
@@ -621,18 +618,20 @@ class CollegeUI(CourseManager):
                 self.addModuleScreen()
             elif(x == 3):#delete module
                 self.deleteModuleScreen()
+            else:
+                #raise
+                msg = Color("{autored}An issue occurred. Try again{/autored}")
+                self.goBack(msg, self.welcomeScreen)
+            """ removed due to list changing error, see TODO up top
             elif(x == 4):#bulk enroll
                 self.bulkEnrollStudentScreen()
             elif(x == 5):#bulk unenroll
                 self.bulkUnenrollStudentScreen()
-            else:
-                raise
-                #msg = Color("{autored}Not a valid choice. Try again{/autored}")
-                #self.goBack(msg, self.WelcomeScreen)
+            """
         except:
-            raise
-            #msg = Color("{autored}Not a valid choice. Try again{/autored}")
-            #self.goBack(msg, self.WelcomeScreen)
+            #raise #show errors
+            msg = Color("{autored}An issue occurred. Try again{/autored}")
+            self.goBack(msg, self.welcomeScreen)
     def moduleDetailScreen(self):
         #show a list of all modules.
         self.clear()#clear the terminal
