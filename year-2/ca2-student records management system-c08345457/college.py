@@ -60,8 +60,8 @@ TODO(rob): checking if student already part of module/ module already taken by s
 from terminaltables import AsciiTable # we are using the ascii table layout.
 from colorclass import Color, Windows # we are using color and windows to color the qty level in the terminal
 from os import system, name # used for clearing terminal function
-from sys import exit
-
+from sys import exit # we use system exit to allow us to quit the program
+import re # we use regular expressions to do form validation
 # This is an entity class that holds information about a student.
 class Student():
     def __init__(self, id, name, email, max):
@@ -479,9 +479,9 @@ class CollegeUI(CourseManager):
                 self.goBack(msg, self.studentScreen)  
             elif(z == 1):
                 student = self.cm.students[y]
-                name = input("Student Name: ", "text")
+                name = self.choice("Student Name: ", "text")
                 student.name = name
-                email = input("Student Email: ", "email")
+                email = self.choice("Student Email: ", "email")
                 student.email = email
                 msg = Color("{autoblue}returning to student menu...{/autoblue}")
                 self.goBack(msg, self.studentScreen)  
@@ -717,7 +717,7 @@ class CollegeUI(CourseManager):
         input("Press Enter to continue...")
         method_to_run = action()
         return method_to_run   
-    def choice(self, msg, type="binary"):
+    def choice(self, msg, type="binary"):#form validation default is binary choice
         #import re and use regular expressions to filter out unwanted input behaviour
         #type="numbers"
         if(type=="binary"):
@@ -733,10 +733,42 @@ class CollegeUI(CourseManager):
                 x = int(x)
             return x
         elif(type=="text"):
-            return str(x)
-        elif(type=="email"):
-            #check if @ in it
-           return str(x) 
+            pattern = "[a-zA-Z]+\s[a-zA-Z]+"
+            x = input(msg)
+            valid = False
+            valid_text = ""
+            while !valid:
+                if(re.search(pattern, x)):
+                    valid = True
+                    valid_text = str(x)
+                else:
+                    valid = False
+                    msg = Color("{autored}Invalid Text{/autored}") + ". Try again: "
+                    x = str(input(msg))
+            return valid_text
+        elif(type=="email"):#email validation
+            #pattern accepts uppercase, lowercase and numbers
+            #plus means we want 1 or more of these characters
+            #we first check everything until we hit an @ symbol
+            #then up to dot using backslash
+            #finally we only accept a .com or a .ie email address
+            # This was adapted from https://www.youtube.com/watch?v=UQQsYXa1EHs
+            pattern = "[a-zA-Z0-9]+@[a-zA-Z]+\.(com|ie)"
+            x = input(msg)
+            valid = False
+            valid_email = ""
+            while !valid:
+                if(re.search(pattern, x)):
+                    valid = True
+                    valid_email = str(x)
+                else:
+                    valid = False
+                    msg = Color("{autored}Invalid Email{/autored}") + ". Try again: "
+                    x = str(input(msg))
+            return valid_email
+        elif(type=="numbers"):
+            return int(x)
+            
     def quitApp(self):
         self.clear()
         print("quitting " + Color("{autoblue}pyLearn{/autoblue}") + "...")
