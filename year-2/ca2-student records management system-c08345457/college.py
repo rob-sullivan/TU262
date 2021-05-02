@@ -331,23 +331,28 @@ class CourseManager(Student, Module):
         module = self.modules[mod_id]
         
         #check if student can take more classes
-        
-        #check if module taken by student
-        for mod in student.modules_taken.keys()
-            if(mod !== mod_id):
-                student.modules_taken[mod_id] = module
-            else:
-                print(student.name + " is already taking " + module.name)
+        #student.max_cap
+        if(len(student.modules_taken) !== max_cap):
+            #check if module taken by student
+            for mod in student.modules_taken.keys()
+                if(mod !== mod_id):
+                    student.modules_taken[mod_id] = module
+                else:
+                    print(student.name + " is already taking " + module.name)
+        else:
+            print(student.name + " can't take anymore classes. Unenroll first.")
 
         #check if module is not full
-
-        #check if student in module
-        for stu in module.students_in_module.keys()
-            if(stu !== stu_id):
-                module.students_in_module[stu_id] = student
-            else:
-                print(module.nam + " shows " + student.name + " is enrolled in it")
-
+        if(len(module.students_in_module) !== module.max_cap):
+            #check if student in module
+            for stu in module.students_in_module.keys()
+                if(stu !== stu_id):
+                    module.students_in_module[stu_id] = student
+                else:
+                    print(module.nam + " shows " + student.name + " is enrolled in it")
+        else:
+            print(module.name + " is full. Unenroll first.")
+            
     #unenroll Student
     def unenrollStudent(self, stu_id, mod_id):
         stu_id = int(stu_id)
