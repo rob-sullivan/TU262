@@ -1,5 +1,4 @@
-# TU262
-## Computing (Fundamentals of) Masters Qualifier Part-Time
+# TU262 - Computing (Fundamentals of) Masters Qualifier Part-Time
 1. Object-Oriented Software Development
 2. Information Systems
 3. Architecture, Operating Systems and Networks
